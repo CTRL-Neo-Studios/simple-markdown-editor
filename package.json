@@ -1,0 +1,36 @@
+{
+	"name": "nuxt-app",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "nuxt build",
+		"dev": "nuxt dev",
+		"generate": "nuxt generate",
+		"preview": "nuxt preview",
+		"postinstall": "nuxt prepare",
+		"tauri": "cd src-tauri && tauri",
+		"tauri:dev": "cd src-tauri && pnpm tauri dev",
+		"tauri:build": "cd src-tauri && pnpm i && pnpm tauri build",
+		"tauri:build:debug": "cd src-tauri && pnpm tauri build --debug",
+		"lint": "eslint .",
+		"lint:fix": "eslint --fix ."
+	},
+	"dependencies": {
+		"@iconify-json/lucide": "^1.2.44",
+		"@iconify-json/simple-icons": "^1.2.35",
+		"@nuxt/fonts": "0.11.4",
+		"@nuxt/icon": "1.13.0",
+		"@nuxt/image": "1.10.0",
+		"@nuxt/ui": "3.1.2",
+		"@nuxtjs/i18n": "9.5.4",
+		"@vueuse/nuxt": "13.2.0",
+		"nuxt": "^3.17.4",
+		"nuxt-auth-utils": "0.5.20",
+		"vue": "^3.5.14"
+	},
+	"devDependencies": {
+		"@tauri-apps/cli": "^2.5.0",
+		"eslint": "^9.27.0",
+		"typescript": "^5.8.3"
+	}
+}
