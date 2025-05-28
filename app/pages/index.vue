@@ -4,6 +4,6 @@
 
 <template>
     <div class="h-screen w-full">
-        <SimpleEditorMarkdown/>
+        <SimpleEditorMarkdocMarkdown/>
     </div>
 </template>
