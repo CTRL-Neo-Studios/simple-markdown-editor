@@ -10,6 +10,8 @@ const tokenElement = [
     'StrongEmphasis',
     'FencedCode',
     'Link',
+    'Strikethrough',
+    'Task',
 ];
 
 const tokenHidden = [
@@ -19,6 +21,8 @@ const tokenHidden = [
     'CodeMark',
     'CodeInfo',
     'URL',
+    'StrikethroughMark',
+    'TaskMarker',
 ];
 
 const decorationHidden = Decoration.mark({ class: 'cm-markdoc-hidden' });
@@ -46,18 +50,16 @@ export default class RichEditPlugin implements PluginValue {
             syntaxTree(view.state).iterate({
                 from, to,
                 enter(node) {
+                    if ((node.name.startsWith('ATXHeading') || tokenElement.includes(node.name)) && cursor.from >= node.from && cursor.to <= node.to)
+                        return false;
+
                     if (node.name === 'MarkdocTag')
                         widgets.push(decorationTag.range(node.from, node.to));
 
                     if (node.name === 'FencedCode')
                         widgets.push(decorationCode.range(node.from, node.to));
 
-                    if ((node.name.startsWith('ATXHeading') || tokenElement.includes(node.name)) &&
-                        cursor.from >= node.from && cursor.to <= node.to)
-                        return false;
-
-                    if (node.name === 'ListMark' && node.matchContext(['BulletList', 'ListItem']) &&
-                        cursor.from != node.from && cursor.from != node.from + 1)
+                    if (node.name === 'ListMark' && node.matchContext(['BulletList', 'ListItem']) && cursor.from != node.from && cursor.from != node.from + 1)
                         widgets.push(decorationBullet.range(node.from, node.to));
 
                     if (node.name === 'HeaderMark')
@@ -65,10 +67,11 @@ export default class RichEditPlugin implements PluginValue {
 
                     if (tokenHidden.includes(node.name))
                         widgets.push(decorationHidden.range(node.from, node.to));
+
                 }
             });
         }
 
-        return Decoration.set(widgets);
+        return Decoration.set(widgets, true);
     }
 }

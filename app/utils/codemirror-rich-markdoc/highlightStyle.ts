@@ -1,5 +1,5 @@
 import { HighlightStyle } from '@codemirror/language';
-import { tags as t } from '@lezer/highlight';
+import {Tag, tags as t} from '@lezer/highlight';
 
 export default HighlightStyle.define([
     { tag: t.heading1, class: 'prose-cm-h1' },
@@ -14,4 +14,9 @@ export default HighlightStyle.define([
     { tag: t.monospace, class: 'prose-cm-monospace' },
     { tag: t.content, class: 'prose-cm-content' },
     { tag: t.meta, class: 'prose-cm-meta' },
+    { tag: t.strikethrough, class: 'prose-cm-strikethrough' },
+    { tag: t.contentSeparator, class: 'prose-cm-horizontalrule' },
+    { tag: Tag.define('TaskMarker'), class: 'prose-cm-task' },
+    { tag: Tag.define('Superscript'), class: 'prose-cm-superscript' },
+    { tag: Tag.define('Subscript'), class: 'prose-cm-subscript' },
 ]);

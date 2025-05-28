@@ -3,10 +3,12 @@ import { RangeSet, StateField } from '@codemirror/state';
 import { syntaxTree } from '@codemirror/language';
 
 import markdoc from '@markdoc/markdoc';
+import {unified} from 'unified'
 
 import type { Config } from '@markdoc/markdoc';
 import type { DecorationSet } from '@codemirror/view'
 import type { EditorState, Range } from '@codemirror/state';
+import remarkParse from "remark-parse";
 
 const patternTag = /{%\s*(?<closing>\/)?(?<tag>[a-zA-Z0-9-_]+)(?<attrs>\s+[^]+)?\s*(?<self>\/)?%}\s*$/m;
 
