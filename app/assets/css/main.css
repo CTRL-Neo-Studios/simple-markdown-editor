@@ -11,7 +11,7 @@
     --prose-bold: var(--text-color-default);
     --prose-bullets: var(--text-color-dimmed);
     --prose-captions: var(--text-color-default);
-    --prose-code: var(--text-color-dimmed);
+    --prose-code: var(--text-color-toned);
     --prose-links: var(--text-color-highlighted);
     --prose-headings: var(--text-color-default);
     --prose-quotes: var(--text-color-default);
@@ -49,12 +49,12 @@
         @apply decoration-0 scroll-m-20 text-lg font-semibold tracking-tight text-(--prose-headings);
     }
 
-    .prose-cm-monospace, .cm-markdoc-code {
-        @apply font-mono text-sm!;
+    .prose-cm-monospace {
+        @apply font-mono text-sm! bg-elevated rounded px-1 text-(--prose-code);
+    }
 
-        .prose-cm-content {
-            @apply font-mono text-sm!;
-        }
+    .cm-markdoc-code {
+        @apply font-mono text-sm!;
     }
 
     .prose-cm-link {

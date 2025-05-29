@@ -24,7 +24,10 @@ function buildCodeBlockDecorations(state: EditorState): EditorRange<Decoration>[
                 while (scanPos > node.from && /\s/.test(state.doc.sliceString(scanPos - 1, scanPos))) {
                     scanPos--;
                 }
-                const lastLineNode = state.doc.lineAt(scanPos > node.from ? scanPos -1 : node.from);
+                const lastLineNode = state.doc.lineAt(scanPos > node.from ? scanPos : node.from);
+                let lastLineNodeNum = lastLineNode.number
+                if (lastLineNode.text != '```')
+                    lastLineNodeNum += 1;
 
 
                 let language = '';
@@ -36,7 +39,7 @@ function buildCodeBlockDecorations(state: EditorState): EditorRange<Decoration>[
                 // --- Extract pure code content ---
                 let codeText = "";
                 const firstContentLineNum = firstLineNode.number + 1;
-                const lastContentLineNum = lastLineNode.number - 1;
+                const lastContentLineNum = lastLineNodeNum - 1;
 
                 if (firstContentLineNum <= lastContentLineNum) {
                     const contentStartOffset = state.doc.line(firstContentLineNum).from;
@@ -59,7 +62,7 @@ function buildCodeBlockDecorations(state: EditorState): EditorRange<Decoration>[
                                 widget: new LanguageFlairWidget(language, codeText),
                             }).range(line.from, line.to)); // Replace entire line content
                         }
-                    } else if (currentLineNum === lastLineNode.number) { // Last line of the block
+                    } else if (currentLineNum === lastLineNodeNum) { // Last line of the block
                         lineClasses.push('cm-line-codeblock-end');
                         if (!cursorFocusedOnThisLine) {
                             decorations.push(Decoration.replace({
