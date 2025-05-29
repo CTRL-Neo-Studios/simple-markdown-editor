@@ -9,6 +9,24 @@ function applyLineLevelClasses(state: EditorState): Range<Decoration>[] {
         enter(node) {
             // For ATX Headings (e.g., # H1)
             if (node.name.startsWith('ATXHeading')) {
+                // --- Check if this heading is inside a Blockquote ---
+                let isInsideBlockquote = false;
+                let parent = node.node.parent; // Access the Lezer Tree node
+                while (parent) {
+                    if (parent.name === 'Blockquote') { // Standard Lezer GFM name
+                        isInsideBlockquote = true;
+                        break;
+                    }
+                    parent = parent.parent;
+                }
+
+                if (isInsideBlockquote) {
+                    // If inside a blockquote, do not apply special heading line styles.
+                    // Let it be styled as regular blockquote content.
+                    return; // Skip applying heading-specific line decorations for this node
+                }
+                // --- End of Blockquote check ---
+
                 const levelMatch = node.name.match(/ATXHeading(\d)/);
                 if (levelMatch && levelMatch[1]) {
                     const level = parseInt(levelMatch[1], 10);

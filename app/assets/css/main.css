@@ -75,7 +75,7 @@
     }
 
     .prose-cm-meta {
-        @apply text-muted;
+        @apply text-dimmed!;
     }
 
     .prose-cm-hr-widget {

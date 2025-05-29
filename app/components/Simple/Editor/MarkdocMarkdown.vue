@@ -65,13 +65,12 @@ onMounted(() => {
     });
 
     extensions.value = [
-        richPluginInstance,
-        // headingRenderPlugin,
+        EditorView.lineWrapping,
         horizontalRulePlugin,
         lineStylingPlugin,
         codeBlockStylePlugin,
+        richPluginInstance,
 
-        EditorView.lineWrapping,
         history(),
         drawSelection(),
         rectangularSelection(),
