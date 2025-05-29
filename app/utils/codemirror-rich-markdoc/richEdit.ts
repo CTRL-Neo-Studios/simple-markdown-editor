@@ -32,7 +32,7 @@ const decorationCode = Decoration.mark({ class: 'cm-markdoc-code' });
 const decorationTag = Decoration.mark({ class: 'cm-markdoc-tag' });
 
 export default class RichEditPlugin implements PluginValue {
-    public decorations: DecorationSet;
+    decorations: DecorationSet;
 
     constructor(view: EditorView) {
         this.decorations = this.process(view);
@@ -71,9 +71,13 @@ export default class RichEditPlugin implements PluginValue {
                         return; // Or `continue;` depending on Lezer's iterate API version details
                     }
 
-                    if ((nodeName.startsWith('ATXHeading') || tokenElement.includes(nodeName)) &&
-                        (cursorFrom >= nodeFrom && cursorTo <= nodeTo))
-                        return false;
+                    if ((nodeName.startsWith('ATXHeading') || tokenElement.includes(nodeName))) {
+                        if (cursorFrom == cursorTo) {
+                            if (cursorFrom >= nodeFrom && cursorTo <= nodeTo) return false;
+                        } else {
+                            if ((cursorFrom >= nodeFrom && cursorFrom <= nodeTo) || (cursorTo >= nodeFrom && cursorTo <= nodeTo)) return false;
+                        }
+                    }
 
                     if (nodeName === 'MarkdocTag')
                         widgets.push(decorationTag.range(nodeFrom, nodeTo));
