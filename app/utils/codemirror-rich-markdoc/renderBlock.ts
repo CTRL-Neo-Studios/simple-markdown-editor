@@ -50,7 +50,7 @@ function replaceBlocks(state: EditorState, config: Config, from?: number, to?: n
     syntaxTree(state).iterate({
         from, to,
         enter(node) {
-            if (!['Table', 'Blockquote', 'MarkdocTag'].includes(node.name))
+            if (!['Table', 'MarkdocTag'].includes(node.name))
                 return;
 
             if (node.name === 'MarkdocTag') {

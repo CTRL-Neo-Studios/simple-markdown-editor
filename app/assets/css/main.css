@@ -6,70 +6,184 @@
     --font-mono: "JetBrains Mono", monospace;
 }
 
-.cm-markdoc-hidden {
-    @apply hidden;
+:root, .light {
+    --prose-body: var(--text-color-default);
+    --prose-bold: var(--text-color-default);
+    --prose-bullets: var(--text-color-dimmed);
+    --prose-captions: var(--text-color-default);
+    --prose-code: var(--text-color-dimmed);
+    --prose-links: var(--text-color-highlighted);
+    --prose-headings: var(--text-color-default);
+    --prose-quotes: var(--text-color-default);
+    --prose-quote-borders: var(--text-color-default);
 }
 
-.prose-cm-h1 {
-    @apply text-4xl font-sans decoration-0;
+.dark {
+    --prose-body: var(--text-color-default);
+    --prose-bold: var(--text-color-default);
+    --prose-bullets: var(--text-color-dimmed);
+    --prose-captions: var(--text-color-default);
+    --prose-code: var(--text-color-dimmed);
+    --prose-links: var(--text-color-highlighted);
+    --prose-headings: var(--text-color-default);
+    --prose-quotes: var(--text-color-default);
+    --prose-quote-borders: var(--text-color-default);
 }
 
-.prose-cm-h2 {
-    @apply text-3xl font-sans decoration-0;
-}
+.cm-content {
+    @apply font-sans;
 
-.prose-cm-h3 {
-    @apply text-2xl font-sans decoration-0;
-}
-
-.prose-cm-h4 {
-    @apply text-xl font-sans decoration-0;
-}
-
-.prose-cm-h5 .prose-cm-h6 {
-    @apply text-lg font-sans decoration-0;
-}
-
-.cm-markdoc-code {
-    @apply font-mono text-sm;
-
-    .prose-cm-content {
-        @apply font-mono text-sm;
+    .prose-cm-h1 {
+        @apply decoration-0 scroll-m-20 text-3xl font-extrabold tracking-tight lg:text-4xl text-(--prose-headings);
     }
-}
 
-.prose-cm-content {
-    @apply font-sans;
-}
+    .prose-cm-h2 {
+        @apply decoration-0 scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 text-(--prose-headings);
+    }
 
-.prose-cm-link {
-    @apply font-sans underline text-primary;
-}
+    .prose-cm-h3 {
+        @apply decoration-0 scroll-m-20 text-xl font-semibold tracking-tight text-(--prose-headings);
+    }
 
-.prose-cm-strikethrough {
-    @apply font-sans line-through;
-}
+    .prose-cm-h4, .prose-cm-h5, .prose-cm-h6 {
+        @apply decoration-0 scroll-m-20 text-lg font-semibold tracking-tight text-(--prose-headings);
+    }
 
-.prose-cm-horizontalrule {
-    @apply font-sans;
-    /* Or your preferred style */
-}
+    .prose-cm-monospace, .cm-markdoc-code {
+        @apply font-mono text-sm!;
 
-.prose-cm-taskmarker-source { /* For the full TaskMarker like `[ ]` or `[x]` when visible */
-    @apply text-dimmed font-mono;
-    /* Example style */
-}
+        .prose-cm-content {
+            @apply font-mono text-sm!;
+        }
+    }
 
-.prose-cm-taskmarker-source-content { /* For the 'x' or space within the marker, if you want to style it differently */
-    /* @apply font-bold; */ /* Example */
-}
+    .prose-cm-link {
+        @apply underline text-primary;
+    }
 
-.cm-task-item.cm-task-unchecked::before {
-    /* Default state is defined above */
-}
+    .prose-cm-strong {
+        @apply font-bold;
+    }
 
-.cm-line {
-    @apply text-base;
+    .prose-cm-strikethrough {
+        @apply line-through;
+    }
+
+    .prose-cm-horizontalrule {
+        @apply text-dimmed;
+        /* Or your preferred style */
+    }
+
+    .prose-cm-meta {
+        @apply text-muted;
+    }
+
+    .prose-cm-hr-widget {
+        @apply inline-flex px-4 my-2 w-full;
+
+        hr {
+            @apply w-full border-muted;
+        }
+    }
+
+    /* New styles for superscript/subscript */
+    .prose-cm-superscript {
+        @apply align-super text-xs;
+        /* Tailwind utility for vertical-align: super and smaller font */
+    }
+
+    .prose-cm-subscript {
+        @apply align-sub text-xs;
+        /* Tailwind utility for vertical-align: sub and smaller font */
+    }
+
+    .prose-cm-task {
+        @apply bg-primary w-2 h-2;
+    }
+
+    .prose-cm-blockquote, .prose-cm-blockquote-begin, .prose-cm-blockquote-end {
+        @apply border-l-6 border-(--prose-quote-borders) pl-6 text-sm mx-2 text-(--prose-quotes) bg-(--ui-bg-muted);
+
+        * {
+            @apply text-(--prose-quotes);
+        }
+    }
+
+    .prose-cm-blockquote-begin {
+        @apply rounded-t;
+    }
+
+    .prose-cm-blockquote-end {
+        @apply rounded-b;
+    }
+
+    .prose-cm-codeblock, .prose-cm-codeblock-begin, .prose-cm-codeblock-end {
+        @apply font-mono py-0 my-0 text-sm! font-semibold border-x border-x-default mx-2 px-3 bg-muted relative;
+
+        .cm-codeblock-flair-container {
+            @apply absolute top-2 right-2 overflow-visible z-10;
+            .cm-codeblock-copy-button {
+                @apply rounded hover:bg-elevated transition duration-200 cursor-pointer py-1.5 px-2 font-sans text-dimmed;
+            }
+        }
+    }
+
+    .prose-cm-codeblock-begin {
+        @apply rounded-t-lg border-t border-t-default pt-1 px-1;
+    }
+
+    .prose-cm-codeblock-end {
+        @apply rounded-b-lg border-b border-b-default pb-1 px-1;
+    }
+
+
+    .cm-markdoc-bullet * {
+        @apply hidden;
+    }
+
+    .cm-markdoc-bullet::after {
+        @apply inline text-dimmed content-['•'];
+    }
+
+    .cm-markdoc-tag {
+        @apply text-dimmed;
+    }
+
+    .cm-markdoc-fallbackTag {
+        @apply border border-default bg-primary mx-2 p-2 rounded-lg;
+
+        .icon {
+            @apply text-2xl mr-2.5 text-default;
+        }
+    }
+
+    .cm-markdoc-fallbackTag--name {
+        @apply bg-primary p-1.5 text-inverted;
+    }
+
+    .cm-markdoc-fallbackTag--inner {
+        @apply p-2.5 bg-elevated rounded;
+    }
+
+    .cm-markdoc-callout {
+        @apply border border-default bg-elevated my-1.5 mx-2 p-2 flex rounded-lg;
+
+        .icon {
+            @apply text-2xl mr-2.5 text-default;
+        }
+    }
+
+    .cm-markdoc-callout--warning {
+        @apply bg-warning/20 border border-warning;
+    }
+
+    .cm-markdoc-hidden {
+        @apply hidden;
+    }
+
+    .cm-line {
+        @apply text-base;
+    }
 }
 
 .cm-task-item.cm-task-checked::before {
@@ -79,83 +193,6 @@
     background-repeat: no-repeat;
     background-position: center;
     background-size: 75%;
-}
-
-.prose-cm-monospace {
-    @apply font-mono text-sm;
-
-    .prose-cm-content {
-        @apply font-mono text-sm;
-    }
-}
-
-.prose-cm-meta {
-    @apply text-dimmed;
-}
-
-.prose-cm-hr-widget {
-    @apply inline-flex px-4 my-2 w-full;
-
-    hr {
-        @apply w-full border-muted;
-    }
-}
-
-/* New styles for superscript/subscript */
-.prose-cm-superscript {
-    @apply align-super text-xs;
-    /* Tailwind utility for vertical-align: super and smaller font */
-}
-
-.prose-cm-subscript {
-    @apply align-sub text-xs;
-    /* Tailwind utility for vertical-align: sub and smaller font */
-}
-
-.prose-cm-task {
-    @apply bg-primary w-2 h-2;
-}
-
-
-.cm-markdoc-bullet * {
-    @apply hidden;
-}
-
-.cm-markdoc-bullet::after {
-    @apply inline text-dimmed content-['•'];
-}
-
-.cm-markdoc-tag {
-    @apply text-dimmed;
-}
-
-.cm-markdoc-fallbackTag {
-    @apply border border-default bg-primary mx-2 p-2 rounded-lg;
-
-    .icon {
-        @apply text-2xl mr-2.5 text-default;
-    }
-}
-
-.cm-markdoc-fallbackTag--name {
-    @apply bg-primary p-1.5 text-inverted;
-}
-
-.cm-markdoc-fallbackTag--inner {
-    @apply p-2.5 bg-elevated rounded;
-}
-
-.cm-markdoc-callout {
-    @apply border border-default bg-elevated my-1.5 mx-2 p-2 flex rounded-lg;
-
-    .icon {
-        @apply text-2xl mr-2.5 text-default;
-    }
-}
-
-
-.cm-markdoc-callout--warning {
-    @apply bg-warning/20 border border-warning;
 }
 
 .cm-markdoc-renderBlock {
@@ -187,14 +224,6 @@
 
     em {
         @apply text-(--prose-captions)
-    }
-
-    blockquote {
-        @apply mt-3 border-l-6 border-(--prose-quote-borders) pl-6 text-sm text-(--prose-quotes) bg-(--ui-bg-muted) py-3;
-
-        * {
-            @apply text-(--prose-quotes);
-        }
     }
 
     table {
@@ -232,4 +261,8 @@
     small {
         @apply text-sm font-medium leading-none text-(--prose-body)/70;
     }
+}
+
+.cm-cursor {
+    @apply border-l-primary! border-l-[1.6px]!;
 }

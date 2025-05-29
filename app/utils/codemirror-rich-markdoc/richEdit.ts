@@ -12,6 +12,7 @@ const tokenElement = [
     'Link',
     'Strikethrough',
     'Task',
+    // 'Blockquote',
 ];
 
 const tokenHidden = [
@@ -31,7 +32,7 @@ const decorationCode = Decoration.mark({ class: 'cm-markdoc-code' });
 const decorationTag = Decoration.mark({ class: 'cm-markdoc-tag' });
 
 export default class RichEditPlugin implements PluginValue {
-    decorations: DecorationSet;
+    public decorations: DecorationSet;
 
     constructor(view: EditorView) {
         this.decorations = this.process(view);
@@ -50,23 +51,30 @@ export default class RichEditPlugin implements PluginValue {
             syntaxTree(view.state).iterate({
                 from, to,
                 enter(node) {
-                    if ((node.name.startsWith('ATXHeading') || tokenElement.includes(node.name)) && cursor.from >= node.from && cursor.to <= node.to)
+                    const cursorFrom = cursor?.from || 0
+                    const cursorTo = cursor?.to || 0
+                    const nodeFrom = node.from
+                    const nodeTo = node.to
+                    const nodeName = node.name
+
+                    if ((nodeName.startsWith('ATXHeading') || tokenElement.includes(nodeName)) &&
+                        (cursorFrom >= nodeFrom && cursorTo <= nodeTo))
                         return false;
 
-                    if (node.name === 'MarkdocTag')
-                        widgets.push(decorationTag.range(node.from, node.to));
+                    if (nodeName === 'MarkdocTag')
+                        widgets.push(decorationTag.range(nodeFrom, nodeTo));
 
-                    if (node.name === 'FencedCode')
-                        widgets.push(decorationCode.range(node.from, node.to));
+                    if (nodeName === 'FencedCode')
+                        widgets.push(decorationCode.range(nodeFrom, nodeTo));
 
-                    if (node.name === 'ListMark' && node.matchContext(['BulletList', 'ListItem']) && cursor.from != node.from && cursor.from != node.from + 1)
-                        widgets.push(decorationBullet.range(node.from, node.to));
+                    if (nodeName === 'ListMark' && node.matchContext(['BulletList', 'ListItem']) && cursorFrom != nodeFrom && cursorFrom != nodeFrom + 1)
+                        widgets.push(decorationBullet.range(nodeFrom, nodeTo));
 
-                    if (node.name === 'HeaderMark')
-                        widgets.push(decorationHidden.range(node.from, node.to + 1));
+                    if (nodeName === 'HeaderMark')
+                        widgets.push(decorationHidden.range(nodeFrom, nodeTo + 1));
 
-                    if (tokenHidden.includes(node.name))
-                        widgets.push(decorationHidden.range(node.from, node.to));
+                    if (tokenHidden.includes(nodeName))
+                        widgets.push(decorationHidden.range(nodeFrom, nodeTo));
 
                 }
             });

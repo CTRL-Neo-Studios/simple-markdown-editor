@@ -25,9 +25,9 @@ export default function (config: MarkdocPluginConfig) {
             markdown(mergedConfig)
         ],
         eventHandlers: {
-            mousedown({ target }, view) {
-                if (target instanceof Element && target.matches('.cm-markdoc-renderBlock *'))
-                    view.dispatch({ selection: { anchor: view.posAtDOM(target) } });
+            mousedown(event, view) {
+                if (event.target instanceof Element && event.target.matches('.cm-markdoc-renderBlock *'))
+                    view.dispatch({ selection: { anchor: view.posAtDOM(event.target) } });
             }
         }
     });
