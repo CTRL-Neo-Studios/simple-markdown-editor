@@ -1,7 +1,17 @@
 # Simple Markdown Editor
-
 _As it turns out, making a simple markdown editor is not simple at all._
 
 Simple Markdown Editor is my pathetic attempt at trying to replicate Obsidian's fabulous WYSIWYG Markdown Editor using CodeMirror.
 It's currently using an implementation based on [segphault/codemirror-rich-markdoc](https://github.com/segphault/codemirror-rich-markdoc)'s
 WYSIWYG MarkDoc-Based CM6 editor, and I'll switch the MarkDoc Implementation to [remark/remarkjs] once I get the markdown editing done.
+
+# Cliches and Hopes
+## Cliches of the Implementation
+- The styling of the codeblock is weird. When you only have \`\`\`, the next line is falsely recognized as a FencedCode mark, which means after your cursor leaves that line, the editor will hide it. Same goes for the last line of the codeblock. Though, this only applies when the codeblock is not closed. When the codeblock is closed, everything works fine.
+- The core of the WYSIWYG implementation is that it uses [@lezer-parser/markdown] to parse the entire document or a recognized node into an AST, then hiding the Markdown Mark of that node or replacing the node with a `RenderBlockWidget`. Obsidian does the similar thing, in fact, I believe they have their own fork of CodeMirror 6-Compatible-HyperMD. The cliche of that implementation in this editor is that the `Decoration Mark` or the `RenderBlockWidget` gets replaced when the mouse clicks down on the editor, whereas in Obsidian, they get replaced when the mouse button is released. The nuisance of a small teensy mechanic is that this allows more precise markdown editing in a WYSIWYG line, but without it, you'd have less precision and control over the editor. I doubt that Obsidian has a specific impl. to add in this mechanic (because it probably came built in with HyperMD), but it does wreck the User Experience a bit without it.
+- The `RenderBlockWidget` implementation is currently using MarkDoc (based on the implementation from @segphault), which is great, but MarkDoc does not allow custom markdown parsing (I'm referring to wikilinks, callouts that conforms to the Obsidian-Flavored Markdown Syntax, etc.). I'm going to switch MarkDoc for remark, which is its own problem, but Markdown parsing is a **huge pain** in my arse and trying to parse Obsidian-Flavored Markdown Syntax isn't that easy. I believe LLMs handles regexes well, but goddamn stuff like trying to get a wikilink recognized as a wikilink instead of a link with a pair of brackets surrounding it is magical. In fact, @segphault expressed the same frustration in his original implementation, which really does not boost confidence a lot.
+
+## Hopes
+- Before they (hopes and dreams) get crushed, I really aspire to make this an implementation that I can use in my other projects, like a plug-and-play. Hopefully this goes for the same for other people.
+- Parsing Obsidian-Flavored Markdown is a huge pain. It's brilliant and props to the Obsidian team for that, but to the one who nailed Markdown parsing, damn.... you're a genius. Hopefully, I can achieve most of the aspects of OFM parsing and try to make it look good in the editor.
+- Since this project is originally meant to be a markdown editor, I don't want to make this into a full-fledged Obsidian-Alternative Note-taking app. Obsidian combines technology in a way that's super great and efficient. It's like... the neovim of note taking apps, except it's more user-friendly. Instead, I want to make the editor look, work, and run similar to Obsidian's WYSIWYG editor, and have it plug-and-playable/modular and have people customize it to their own needs.
