@@ -122,6 +122,6 @@ div[contenteditable='true']:focus {
 }
 
 .cm-selectionBackground {
-    @apply bg-primary/50!;
+    @apply bg-primary/50! z-20;
 }
 </style>
