@@ -1,39 +1,7 @@
-# Nuxt UI v3 Starter
+# Simple Markdown Editor
 
-Look at [Nuxt docs](https://nuxt.com/docs/getting-started/introduction) and [Nuxt UI docs](https://ui3.nuxt.dev) to learn more.
+_As it turns out, making a simple markdown editor is not simple at all._
 
-## Setup
-
-Make sure to install the dependencies:
-
-```bash
-# pnpm
-pnpm install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# pnpm
-pnpm run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# pnpm
-pnpm run build
-```
-
-Locally preview production build:
-
-```bash
-# pnpm
-pnpm run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+Simple Markdown Editor is my pathetic attempt at trying to replicate Obsidian's fabulous WYSIWYG Markdown Editor using CodeMirror.
+It's currently using an implementation based on [segphault/codemirror-rich-markdoc](https://github.com/segphault/codemirror-rich-markdoc)'s
+WYSIWYG MarkDoc-Based CM6 editor, and I'll switch the MarkDoc Implementation to [remark/remarkjs] once I get the markdown editing done.
