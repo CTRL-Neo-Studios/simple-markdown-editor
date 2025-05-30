@@ -9,7 +9,7 @@ const toggleableMarkTokens = [
     'QuoteMark',
     'EmphasisMark',
     'StrikethroughMark',
-    'TaskMarker',
+    // 'TaskMarker',
     'CodeMark',
 ];
 

@@ -15,7 +15,11 @@ export type MarkdocPluginConfig = { lezer?: any, markdoc: Config };
 export default function (config: MarkdocPluginConfig) {
     const mergedConfig = {
         ...config.lezer ?? [],
-        extensions: [tagParser, hashtagParser, ...config.lezer?.extensions ?? []]
+        extensions: [tagParser, hashtagParser, ...config.lezer?.extensions ?? []],
+        nested: {
+            blockquote: true,
+            list: true,
+        }
     };
 
     return ViewPlugin.fromClass(RichEditPlugin, {
