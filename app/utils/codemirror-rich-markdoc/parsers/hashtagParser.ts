@@ -15,8 +15,8 @@ export default {
             if (next !== 35) return -1; // 35 is the char code for '#'
 
             // Get the current line's content to check context
-            const line = cx.line;
-            const lineStart = cx.lineStart;
+            // console.log(cx.lineStart, cx.offset) "undefined, 0" what??????? and yet it still works
+            const lineStart = cx.offset;
             const relativePos = pos - lineStart;
 
             // If we're at the very start of a line, check if it's a header
