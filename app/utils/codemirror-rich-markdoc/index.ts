@@ -9,13 +9,19 @@ import renderBlock from './renderBlock';
 
 import type { Config } from '@markdoc/markdoc';
 import hashtagParser from "~/utils/codemirror-rich-markdoc/parsers/hashtagParser";
+import {GFM} from "@lezer/markdown";
 
 export type MarkdocPluginConfig = { lezer?: any, markdoc: Config };
 
 export default function (config: MarkdocPluginConfig) {
     const mergedConfig = {
         ...config.lezer ?? [],
-        extensions: [tagParser, hashtagParser, ...config.lezer?.extensions ?? []],
+        extensions: [
+            tagParser,
+            hashtagParser,
+            GFM,
+            ...config.lezer?.extensions ?? []
+        ],
         nested: {
             blockquote: true,
             list: true,

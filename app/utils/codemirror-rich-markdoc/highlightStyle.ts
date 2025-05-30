@@ -1,6 +1,15 @@
 import { HighlightStyle } from '@codemirror/language';
 import {Tag, tags as t} from '@lezer/highlight';
-import {hashtag} from "~/utils/codemirror-rich-markdoc/parsers/hashtagParser";
+import {hashtag, hashtagLabel, hashtagMark} from "~/utils/codemirror-rich-markdoc/parsers/hashtagParser";
+
+export const internalLink = Tag.define('InternalLink')
+export const internalMark = Tag.define('InternalMark')
+export const internalPath = Tag.define('InternalPath')
+export const internalDisplay = Tag.define('InternalDisplay')
+export const mark = Tag.define('Mark')
+export const markMarker = Tag.define('MarkMarker')
+export const task = Tag.define('Task')
+export const taskMarker = Tag.define('taskMarker')
 
 export default HighlightStyle.define([
     { tag: t.heading, class: 'prose-cm-header-mark' },
@@ -19,7 +28,16 @@ export default HighlightStyle.define([
     { tag: hashtag, class: 'prose-cm-hashtag' },
     { tag: t.strikethrough, class: 'prose-cm-strikethrough' },
     { tag: t.contentSeparator, class: 'prose-cm-horizontalrule' },
-    { tag: Tag.define('TaskMarker'), class: 'prose-cm-task' },
-    { tag: Tag.define('Superscript'), class: 'prose-cm-superscript' },
-    { tag: Tag.define('Subscript'), class: 'prose-cm-subscript' },
+
+    { tag: hashtag, class: 'prose-cm-hashtag' },
+    { tag: hashtagMark, class: 'prose-cm-hashtag-mark' },
+    { tag: hashtagLabel, class: 'prose-cm-hashtag-label' },
+    { tag: internalLink, class: 'prose-cm-internal-link' },
+    { tag: internalMark, class: 'prose-cm-internal-mark' },
+    { tag: internalPath, class: 'prose-cm-internal-path' },
+    { tag: internalDisplay, class: 'prose-cm-internal-display' },
+    { tag: mark, class: 'prose-cm-highlight' },
+    { tag: markMarker, class: 'prose-cm-highlight-marker' },
+    { tag: task, class: 'prose-cm-task' },
+    { tag: taskMarker, class: 'prose-cm-task-marker' },
 ]);

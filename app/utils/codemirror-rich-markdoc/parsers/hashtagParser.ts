@@ -3,6 +3,8 @@ import {Tag, tags as t} from '@lezer/highlight';
 import type { MarkdownConfig } from '@lezer/markdown';
 
 export const hashtag = Tag.define()
+export const hashtagMark = Tag.define()
+export const hashtagLabel = Tag.define()
 
 export default {
     defineNodes: [

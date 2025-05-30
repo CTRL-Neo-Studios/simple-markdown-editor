@@ -140,6 +140,49 @@
         @apply rounded-b-lg border-b border-b-default pb-1 px-1;
     }
 
+    .cm-indent {
+        @apply inline-block whitespace-pre w-[2ch] border-l border-l-default;
+    }
+
+    .task-list-label {
+        @apply rounded-lg bg-muted inline-flex items-center cursor-pointer justify-center align-middle;
+    }
+
+    .task-list-item-checkbox {
+        @apply appearance-none rounded-lg border border-default bg-muted inline-flex items-center justify-center cursor-pointer relative size-4;
+
+        /* Remove native styling */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+
+        /* Custom unchecked state */
+        @apply bg-muted border-default;
+
+        /* Custom checked state */
+        &:checked {
+            @apply bg-primary border-primary;
+
+            /* SVG checkmark */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='white'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        /* Interactive states */
+        &:hover:not(:checked) {
+            @apply border-default bg-muted;
+        }
+
+        &:hover:checked {
+            @apply bg-primary border-primary;
+        }
+
+        &:focus {
+            @apply outline-none ring-2 ring-primary/20;
+        }
+    }
+
 
     .cm-markdoc-bullet * {
         @apply hidden;

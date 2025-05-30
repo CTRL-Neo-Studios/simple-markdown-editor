@@ -41,7 +41,8 @@ import {clickRevealOnMouseUpPlugin} from "~/utils/codemirror-rich-markdoc/clickR
 import {proseAlwaysHiddenPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseAlwaysHiddenPlugin";
 import {proseMarkdocTagPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseMarkdocTagPlugin";
 import {proseToggleableMarksPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseToggleableMarksPlugins";
-import {proseListMarkPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseListMarkPlugin"; // Nuxt uses ~ for srcDir
+import {proseListMarkPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseListMarkPlugin";
+import {proseIndentPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseIndentPlugin";
 
 const props = defineProps<{class?: string}>()
 
@@ -78,6 +79,7 @@ onMounted(() => {
         proseMarkdocTagPlugin,
         proseToggleableMarksPlugin,
         proseListMarkPlugin,
+        proseIndentPlugin,
 
         richPluginInstance,
 
