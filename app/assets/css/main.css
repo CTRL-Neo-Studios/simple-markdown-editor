@@ -78,6 +78,10 @@
         @apply text-dimmed!;
     }
 
+    .prose-cm-hashtag {
+        @apply text-primary border border-primary rounded-xl bg-primary/20 py-0.5 px-1;
+    }
+
     .prose-cm-hr-widget {
         @apply inline-flex px-4 my-2 w-full;
 

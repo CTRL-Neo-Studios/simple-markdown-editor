@@ -1,7 +1,9 @@
 import { HighlightStyle } from '@codemirror/language';
 import {Tag, tags as t} from '@lezer/highlight';
+import {hashtag} from "~/utils/codemirror-rich-markdoc/parsers/hashtagParser";
 
 export default HighlightStyle.define([
+    { tag: t.heading, class: 'prose-cm-header-mark' },
     { tag: t.heading1, container: 'h1', class: 'prose-cm-h1' },
     { tag: t.heading2, container: 'h1', class: 'prose-cm-h2' },
     { tag: t.heading3, container: 'h1', class: 'prose-cm-h3' },
@@ -14,6 +16,7 @@ export default HighlightStyle.define([
     { tag: t.monospace, class: 'prose-cm-monospace' },
     { tag: t.content, class: 'prose-cm-content' },
     { tag: t.meta, class: 'prose-cm-meta' },
+    { tag: hashtag, class: 'prose-cm-hashtag' },
     { tag: t.strikethrough, class: 'prose-cm-strikethrough' },
     { tag: t.contentSeparator, class: 'prose-cm-horizontalrule' },
     { tag: Tag.define('TaskMarker'), class: 'prose-cm-task' },

@@ -37,7 +37,11 @@ import {horizontalRulePlugin} from "~/utils/codemirror-rich-markdoc/renderHorizo
 import {headingRenderPlugin} from "~/utils/codemirror-rich-markdoc/renderHeading";
 import {lineStylingPlugin} from "~/utils/codemirror-rich-markdoc/lineStyling";
 import {codeBlockStylePlugin} from "~/utils/codemirror-rich-markdoc/codeBlockStylePlugin";
-import {clickRevealOnMouseUpPlugin} from "~/utils/codemirror-rich-markdoc/clickRevealOnMouseUp"; // Nuxt uses ~ for srcDir
+import {clickRevealOnMouseUpPlugin} from "~/utils/codemirror-rich-markdoc/clickRevealOnMouseUp";
+import {proseAlwaysHiddenPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseAlwaysHiddenPlugin";
+import {proseMarkdocTagPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseMarkdocTagPlugin";
+import {proseToggleableMarksPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseToggleableMarksPlugins";
+import {proseListMarkPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseListMarkPlugin"; // Nuxt uses ~ for srcDir
 
 const props = defineProps<{class?: string}>()
 
@@ -70,7 +74,11 @@ onMounted(() => {
         horizontalRulePlugin,
         lineStylingPlugin,
         codeBlockStylePlugin,
-        // clickRevealOnMouseUpPlugin,
+        proseAlwaysHiddenPlugin,
+        proseMarkdocTagPlugin,
+        proseToggleableMarksPlugin,
+        proseListMarkPlugin,
+
         richPluginInstance,
 
         history(),

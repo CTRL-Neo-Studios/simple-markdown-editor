@@ -2,19 +2,20 @@ import { ViewPlugin } from '@codemirror/view';
 import { syntaxHighlighting } from '@codemirror/language';
 import { markdown } from '@codemirror/lang-markdown';
 
-import tagParser from './tagParser';
+import tagParser from './parsers/tagParser';
 import highlightStyle from './highlightStyle';
 import RichEditPlugin from './richEdit';
 import renderBlock from './renderBlock';
 
 import type { Config } from '@markdoc/markdoc';
+import hashtagParser from "~/utils/codemirror-rich-markdoc/parsers/hashtagParser";
 
 export type MarkdocPluginConfig = { lezer?: any, markdoc: Config };
 
 export default function (config: MarkdocPluginConfig) {
     const mergedConfig = {
         ...config.lezer ?? [],
-        extensions: [tagParser, ...config.lezer?.extensions ?? []]
+        extensions: [tagParser, hashtagParser, ...config.lezer?.extensions ?? []]
     };
 
     return ViewPlugin.fromClass(RichEditPlugin, {

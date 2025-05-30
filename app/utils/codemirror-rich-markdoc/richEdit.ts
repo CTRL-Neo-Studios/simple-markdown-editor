@@ -1,103 +1,131 @@
-import { Decoration, type PluginValue } from '@codemirror/view';
+import { Decoration, EditorView, type PluginValue } from '@codemirror/view';
 import { syntaxTree } from '@codemirror/language';
-
-import type { DecorationSet, EditorView, ViewUpdate } from '@codemirror/view'
+import type { DecorationSet, ViewUpdate } from '@codemirror/view';
 import type { Range } from '@codemirror/state';
 
-const tokenElement = [
-    'InlineCode',
-    'Emphasis',
-    'StrongEmphasis',
-    'FencedCode',
-    'Link',
-    'Strikethrough',
-    'Task',
-    // 'Blockquote',
+// Existing hidden decoration if needed for other things,
+// but for marks we'll use replace.
+// const decorationHidden = Decoration.mark({ class: 'cm-markdoc-hidden' }); [10]
+
+// Tokens for inline formatting marks whose visibility depends on parent node's active state
+const toggleableMarkTokens = [
+    'HeaderMark',      // For #, ## etc.
+    'QuoteMark',       // For > in blockquotes (already handled, but fits pattern)
+    'EmphasisMark',    // For * and _ in Emphasis, and ** and __ in StrongEmphasis
+    'StrikethroughMark',// For ~~
+    'TaskMarker',      // For [ ], [x]
+    // 'LinkMark' and 'URL' might be more complex if you want to show a rich link widget
 ];
 
-const tokenHidden = [
-    'HardBreak',
-    'LinkMark',
-    'EmphasisMark',
-    'CodeMark',
-    'CodeInfo',
-    'URL',
-    'StrikethroughMark',
-    'TaskMarker',
+// Tokens that are *always* hidden (or replaced), like CodeInfo in FencedCode
+const alwaysHiddenTokens = [
+    'CodeInfo', // Usually good to hide the language string like 'js'
+    // 'LinkSpecificURL', // If you have a Markdoc extension or custom parsing for URLs you always want to hide.
 ];
 
-const decorationHidden = Decoration.mark({ class: 'cm-markdoc-hidden' });
-const decorationBullet = Decoration.mark({ class: 'cm-markdoc-bullet' });
-const decorationCode = Decoration.mark({ class: 'cm-markdoc-code' });
-const decorationTag = Decoration.mark({ class: 'cm-markdoc-tag' });
 
 export default class RichEditPlugin implements PluginValue {
-    decorations: DecorationSet;
+    public decorations: DecorationSet;
 
     constructor(view: EditorView) {
-        this.decorations = this.process(view);
+        this.decorations = this.buildDecorations(view);
     }
 
     update(update: ViewUpdate): void {
-        if (update.docChanged || update.viewportChanged || update.selectionSet)
-            this.decorations = this.process(update.view);
+        if (update.docChanged || update.viewportChanged || update.selectionSet) {
+            this.decorations = this.buildDecorations(update.view);
+        }
     }
 
-    process(view: EditorView): DecorationSet {
-        let widgets: Range<Decoration>[] = [];
-        let [cursor] = view.state.selection.ranges;
+    buildDecorations(view: EditorView): DecorationSet {
+        const widgets: Range<Decoration>[] = [];
+        const { state } = view;
+        const cursor = state.selection.main;
 
-        for (let { from, to } of view.visibleRanges) {
-            syntaxTree(view.state).iterate({
-                from, to,
-                enter(node) {
-                    const cursorFrom = cursor?.from || 0
-                    const cursorTo = cursor?.to || 0
-                    const nodeFrom = node.from
-                    const nodeTo = node.to
-                    const nodeName = node.name
-                    const cursorLineNum = view.state.doc.lineAt(cursorFrom).number;
-                    const nodeLineNum = view.state.doc.lineAt(nodeFrom).number;
+        // Helper to determine if a node (from-to range) is "active"
+        // Active if cursor is within its bounds (empty selection),
+        // OR if part of a multi-character selection intersects it.
+        const isNodeRangeActive = (nodeFrom: number, nodeTo: number): boolean => {
+            if (cursor.empty) { // Single cursor position
+                // Active if cursor is anywhere from the start of the opening mark
+                // to the end of the closing mark.
+                return cursor.from >= nodeFrom && cursor.from <= nodeTo;
+            } else { // Range selection
+                // Active if the selection range overlaps with the node's range.
+                return Math.max(nodeFrom, cursor.from) < Math.min(nodeTo, cursor.to);
+            }
+        };
 
-                    if (nodeName === 'QuoteMark') { // 'QuoteMark' is the typical Lezer name for '>'
-                        if (nodeLineNum !== cursorLineNum) {
-                            // Cursor is not on the same line as the QuoteMark.
-                            // Hide '>' and the following space.
-                            // QuoteMark is just '>', so we extend to `nodeTo + 1` to include the space.
-                            widgets.push(decorationHidden.range(nodeFrom, nodeTo + 1));
-                        }
-                        // If cursor IS on the same line, no decoration is added here, so '>' remains visible.
-                        // It's good practice to stop further processing for this node if handled.
-                        return; // Or `continue;` depending on Lezer's iterate API version details
+        for (const { from, to } of view.visibleRanges) {
+            syntaxTree(state).iterate({
+                from,
+                to,
+                enter: (node) => {
+                    const nodeName = node.name;
+                    const nodeFrom = node.from;
+                    const nodeTo = node.to;
+
+                    // 1. Handle always hidden tokens
+                    if (alwaysHiddenTokens.includes(nodeName)) {
+                        widgets.push(Decoration.replace({}).range(nodeFrom, nodeTo));
+                        return; // Done with this node
                     }
 
-                    if ((nodeName.startsWith('ATXHeading') || tokenElement.includes(nodeName))) {
-                        if (cursorFrom == cursorTo) {
-                            if (cursorFrom >= nodeFrom && cursorTo <= nodeTo) return false;
-                        } else {
-                            if ((cursorFrom >= nodeFrom && cursorFrom <= nodeTo) || (cursorTo >= nodeFrom && cursorTo <= nodeTo)) return false;
+                    // 2. Handle toggleable marks based on parent's active state
+                    if (toggleableMarkTokens.includes(nodeName)) {
+                        const parentNode = node.node.parent;
+                        if (parentNode) {
+                            // Determine the full range of the parent formatting node
+                            // (e.g., for EmphasisMark, parentNode is Emphasis/StrongEmphasis)
+                            const parentFrom = parentNode.from;
+                            const parentTo = parentNode.to;
+
+                            if (!isNodeRangeActive(parentFrom, parentTo)) {
+                                // Parent is INACTIVE: replace the mark with "nothing"
+                                // For HeaderMark, also hide the space after it if it's '# '
+                                let markEnd = nodeTo;
+                                if (nodeName === 'HeaderMark' && state.doc.sliceString(nodeTo -1, nodeTo) === ' '){
+                                    // This is a bit simplistic, assumes space is part of HeaderMark or immediately after.
+                                    // Lezer GFM often includes the space in HeaderMark.
+                                }
+                                widgets.push(Decoration.replace({}).range(nodeFrom, markEnd));
+                            } else {
+                                // Parent is ACTIVE: do nothing, let the mark be visible
+                                // and styled by the syntaxHighlighting theme.
+                                // Obsidian's active header DOM suggests this:
+                                // <span class="cm-formatting cm-formatting-header...">#&nbsp;</span>
+                                // This is just a styled span, not a widget.
+                            }
+                        }
+                        return; // Done with this mark node
+                    }
+
+                    // 3. Existing logic for other things (like FencedCode, MarkdocTag, ListMark)
+                    // These might already use widgets or specific line styles like your codeBlockStylePlugin [1].
+                    // Ensure this logic doesn't conflict.
+
+                    if (nodeName === 'MarkdocTag') { // [10]
+                        widgets.push(Decoration.mark({ class: 'cm-markdoc-tag' }).range(nodeFrom, nodeTo)); // [12]
+                    }
+
+                    if (nodeName === 'FencedCode') { // [10]
+                        // This is likely handled by codeBlockStylePlugin
+                        // widgets.push(Decoration.mark({ class: 'cm-markdoc-code' }).range(nodeFrom, nodeTo)); [12]
+                        return false; // Don't iterate into FencedCode if handled by another plugin
+                    }
+
+                    if (nodeName === 'ListMark' && node.node.matchContext(['BulletList', 'ListItem'])) { // [10]
+                        // If cursor is not on the line of the ListMark, hide it and show bullet widget
+                        const lineOfMark = view.state.doc.lineAt(nodeFrom);
+                        const lineOfCursor = view.state.doc.lineAt(cursor.from);
+                        if (lineOfMark.number !== lineOfCursor.number) {
+                            widgets.push(Decoration.mark({ class: 'cm-markdoc-bullet' }).range(nodeFrom, nodeTo)); // [12]
                         }
                     }
 
-                    if (nodeName === 'MarkdocTag')
-                        widgets.push(decorationTag.range(nodeFrom, nodeTo));
-
-                    if (nodeName === 'FencedCode')
-                        widgets.push(decorationCode.range(nodeFrom, nodeTo));
-
-                    if (nodeName === 'ListMark' && node.matchContext(['BulletList', 'ListItem']) && cursorFrom != nodeFrom && cursorFrom != nodeFrom + 1)
-                        widgets.push(decorationBullet.range(nodeFrom, nodeTo));
-
-                    if (nodeName === 'HeaderMark')
-                        widgets.push(decorationHidden.range(nodeFrom, nodeTo + 1));
-
-                    if (tokenHidden.includes(nodeName))
-                        widgets.push(decorationHidden.range(nodeFrom, nodeTo));
-
-                }
+                },
             });
         }
-
         return Decoration.set(widgets, true);
     }
 }
