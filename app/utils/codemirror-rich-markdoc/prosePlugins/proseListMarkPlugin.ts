@@ -73,7 +73,7 @@ function buildDecorations(state: EditorState): EditorRange<Decoration>[] {
 
                 const lineAttrs: any = {
                     class: lineClasses.join(' '),
-                    style: `text-indent: -${isTaskList ? '30' : (listType === 'ordered' ? '29' : '22')}px; padding-inline-start: ${isTaskList ? '30' : (listType === 'ordered' ? '29' : '22')}px;`
+                    style: `text-indent: -${isTaskList ? '22' : (listType === 'ordered' ? '16' : '16')}px; padding-inline-start: ${isTaskList ? '30' : (listType === 'ordered' ? '22' : '22')}px;`
                 };
 
                 if (isTaskList) {
@@ -106,10 +106,10 @@ function buildDecorations(state: EditorState): EditorRange<Decoration>[] {
                                 Decoration.replace({}).range(taskMarkerNode.from, listMarkerEnd)
                             );
 
-                            // Replace checkbox with widget
+                            // Replace checkbox with widget, passing the checkbox position
                             decorations.push(
                                 Decoration.replace({
-                                    widget: new TaskCheckboxWidget(isChecked)
+                                    widget: new TaskCheckboxWidget(isChecked, checkboxStart)
                                 }).range(checkboxStart, checkboxEnd)
                             );
 
@@ -156,7 +156,7 @@ function buildDecorations(state: EditorState): EditorRange<Decoration>[] {
                         }
                     }
                 } else if (!isTaskList && listMarkNode) {
-                    // Handle regular (non-task) lists
+                    // Handle regular (non-task) lists - keep existing code
                     let markerEnd = listMarkNode.to;
                     if (state.doc.sliceString(listMarkNode.to, listMarkNode.to + 1) === ' ') {
                         markerEnd = listMarkNode.to + 1;
