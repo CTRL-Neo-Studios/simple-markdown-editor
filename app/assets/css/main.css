@@ -34,19 +34,19 @@
     @apply font-sans;
 
     .prose-cm-h1 {
-        @apply decoration-0 scroll-m-20 text-3xl font-extrabold tracking-tight lg:text-4xl text-(--prose-headings);
+        @apply decoration-0 scroll-m-20 text-3xl! font-extrabold tracking-tight lg:text-4xl text-(--prose-headings);
     }
 
     .prose-cm-h2 {
-        @apply decoration-0 scroll-m-20 pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 text-(--prose-headings);
+        @apply decoration-0 scroll-m-20 pb-2 text-2xl! font-semibold tracking-tight transition-colors first:mt-0 text-(--prose-headings);
     }
 
     .prose-cm-h3 {
-        @apply decoration-0 scroll-m-20 text-xl font-semibold tracking-tight text-(--prose-headings);
+        @apply decoration-0 scroll-m-20 text-xl! font-semibold tracking-tight text-(--prose-headings);
     }
 
     .prose-cm-h4, .prose-cm-h5, .prose-cm-h6 {
-        @apply decoration-0 scroll-m-20 text-lg font-semibold tracking-tight text-(--prose-headings);
+        @apply decoration-0 scroll-m-20 text-lg! font-semibold tracking-tight text-(--prose-headings);
     }
 
     .prose-cm-monospace {
