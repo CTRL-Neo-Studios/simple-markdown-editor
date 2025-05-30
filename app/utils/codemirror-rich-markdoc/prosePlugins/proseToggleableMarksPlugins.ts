@@ -38,6 +38,7 @@ function buildDecorations(state: EditorState): EditorRange<Decoration>[] {
                 }
                 tempParent = tempParent.parent;
             }
+
             if (inFencedCode) return false;
 
             if (toggleableMarkTokens.includes(node.name)) {

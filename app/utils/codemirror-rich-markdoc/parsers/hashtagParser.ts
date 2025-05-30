@@ -14,13 +14,22 @@ export default {
             // Check if we're at a '#' character
             if (next !== 35) return -1; // 35 is the char code for '#'
 
-            // Don't parse if it's at the start of a line followed by space (that's a header)
-            const lineStart = cx.offset;
-            if (pos === lineStart && cx.char(pos + 1) === 32) return -1; // 32 is space
+            // Get the current line's content to check context
+            const line = cx.line;
+            const lineStart = cx.lineStart;
+            const relativePos = pos - lineStart;
+
+            // If we're at the very start of a line, check if it's a header
+            if (relativePos === 0) {
+                // Check if the next character is a space or another #
+                const nextChar = cx.char(pos + 1);
+                if (nextChar === 32 || nextChar === 35) { // space or #
+                    return -1; // This is a header, not a hashtag
+                }
+            }
 
             // Check if there's at least one valid character after #
             let end = pos + 1;
-            const text = cx.text;
 
             // First character after # must be alphanumeric
             const firstChar = cx.char(end);
@@ -31,7 +40,7 @@ export default {
             }
 
             // Continue parsing valid hashtag characters
-            while (end < text.length) {
+            while (end < cx.end) {
                 const char = cx.char(end);
                 // Allow alphanumeric, dash, underscore, dot, slash
                 if ((char >= 48 && char <= 57) || // 0-9
@@ -53,6 +62,8 @@ export default {
             }
 
             return -1;
-        }
+        },
+        // Add this to ensure hashtags can be parsed after block elements
+        after: 'Emphasis'
     }]
 } as MarkdownConfig;

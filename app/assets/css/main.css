@@ -79,7 +79,7 @@
     }
 
     .prose-cm-hashtag {
-        @apply text-primary border border-primary rounded-xl bg-primary/20 py-0.5 px-1;
+        @apply text-primary border border-primary/20 rounded-xl bg-primary/20 text-sm py-0.5 px-1;
     }
 
     .prose-cm-hr-widget {
