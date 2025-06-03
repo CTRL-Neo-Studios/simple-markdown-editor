@@ -43,6 +43,8 @@ import {proseMarkdocTagPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugin
 import {proseToggleableMarksPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseToggleableMarksPlugins";
 import {proseListMarkPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseListMarkPlugin";
 import {proseIndentPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseIndentPlugin";
+import {proseInternalLinkPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseInternalLinkPlugin";
+// import {proseListStylingPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseListStylingPlugin";
 
 const props = defineProps<{class?: string}>()
 
@@ -66,7 +68,7 @@ onMounted(() => {
         markdoc: markdocConfig,
         lezer: {
             codeLanguages: languages,
-            extensions: [GFM, { remove: ["SetextHeading"] }],
+            extensions: [],
         }
     });
 
@@ -79,7 +81,9 @@ onMounted(() => {
         proseMarkdocTagPlugin,
         proseToggleableMarksPlugin,
         proseListMarkPlugin,
+        // proseListStylingPlugin,
         proseIndentPlugin,
+        proseInternalLinkPlugin,
 
         richPluginInstance,
 

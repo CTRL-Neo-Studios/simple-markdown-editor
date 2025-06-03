@@ -101,6 +101,22 @@
         /* Tailwind utility for vertical-align: sub and smaller font */
     }
 
+    .prose-cm-highlight {
+        @apply bg-primary/75;
+    }
+
+    .prose-cm-internal-path {
+        @apply text-primary underline;
+    }
+
+    .prose-cm-internal-subpath {
+        @apply text-primary underline italic;
+    }
+
+    .prose-cm-internal-display {
+        @apply text-primary underline;
+    }
+
     .prose-cm-task {
         @apply bg-primary w-2 h-2;
     }

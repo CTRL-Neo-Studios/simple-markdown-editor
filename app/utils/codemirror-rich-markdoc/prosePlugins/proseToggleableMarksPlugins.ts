@@ -11,6 +11,12 @@ const toggleableMarkTokens = [
     'StrikethroughMark',
     // 'TaskMarker',
     'CodeMark',
+    'InternalMark',     // For [[, ]], | in internal links
+    'EmbedMark',        // For ! in embeds
+    'MarkMarker',       // For == in highlights
+    'FootnoteMark',     // For [^, ], : in footnotes
+    'CommentMarker',    // For %% in comments
+    'TexMarker',        // For $ or $$ in TeX
 ];
 
 // Helper from your RichEditPlugin
