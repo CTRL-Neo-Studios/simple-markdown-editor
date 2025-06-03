@@ -47,6 +47,10 @@ function buildDecorations(state: EditorState): EditorRange<Decoration>[] {
 
             if (inFencedCode) return false;
 
+            if(node.name == 'Hashtag') {
+                console.log('ok')
+            }
+
             if (toggleableMarkTokens.includes(node.name)) {
                 const parentNode = node.node.parent;
                 if (parentNode) {

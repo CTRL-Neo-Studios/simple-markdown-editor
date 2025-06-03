@@ -4,8 +4,8 @@ import { Tag, tags as t } from '@lezer/highlight';
 import type { MarkdownConfig, InlineContext } from '@lezer/markdown';
 
 export const hashtag = Tag.define(); // Use existing if already defined in highlightStyle
-export const hashtagMark = Tag.define(); // Use existing
-export const hashtagLabel = Tag.define(); // Use existing
+export const hashtagMark = Tag.define(hashtag); // Use existing
+export const hashtagLabel = Tag.define(hashtag); // Use existing
 
 const hashtagRE = /^[^\u2000-\u206F\u2E00-\u2E7F'!"#$%&()*+,.:;<=>?@^`{|}~\[\]\\\s]+/;
 
@@ -36,6 +36,7 @@ export const obsHashtagParser: MarkdownConfig = { // Renamed slightly to avoid c
 
                 if (match && match[0].length > 0 && /\D/.test(match[0].charAt(0))) { // Label must exist and not start purely numeric
                     currentPos += match[0].length;
+                    // console.log(cx.slice(start, currentPos + 1))
                     return cx.addElement(
                         cx.elt("Hashtag", start, currentPos, [ // Parent element for the whole #tag
                             cx.elt("HashtagMark", start, start + 1),    // '#'
@@ -45,6 +46,7 @@ export const obsHashtagParser: MarkdownConfig = { // Renamed slightly to avoid c
                 }
                 return -1;
             },
+            after: "Emphasis",
             // Runs after emphasis, etc. Should be okay.
             // Consider `after: "Emphasis"` or similar if conflicts arise.
         },

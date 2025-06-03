@@ -44,6 +44,7 @@ import {proseToggleableMarksPlugin} from "~/utils/codemirror-rich-markdoc/proseP
 import {proseListMarkPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseListMarkPlugin";
 import {proseIndentPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseIndentPlugin";
 import {proseInternalLinkPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseInternalLinkPlugin";
+import {proseHashtagWrapperPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseHashtagWrapperPlugin";
 // import {proseListStylingPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseListStylingPlugin";
 
 const props = defineProps<{class?: string}>()
@@ -84,6 +85,7 @@ onMounted(() => {
         // proseListStylingPlugin,
         proseIndentPlugin,
         proseInternalLinkPlugin,
+        proseHashtagWrapperPlugin,
 
         richPluginInstance,
 
