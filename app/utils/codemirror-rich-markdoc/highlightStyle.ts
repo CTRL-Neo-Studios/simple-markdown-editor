@@ -1,4 +1,3 @@
-// ~/utils/codemirror-rich-markdoc/highlightStyle.ts
 import { HighlightStyle } from '@codemirror/language';
 import { Tag, tags as t } from '@lezer/highlight';
 import {hashtag, hashtagLabel, hashtagMark} from "~/utils/codemirror-rich-markdoc/parsers/hashtagParser";

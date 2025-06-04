@@ -1,4 +1,3 @@
-// ~/utils/codemirror-rich-markdoc/keymaps/calloutKeymap.ts
 import { Prec } from '@codemirror/state';
 import { keymap } from '@codemirror/view';
 import { syntaxTree } from '@codemirror/language';

@@ -1,4 +1,3 @@
-// ~/utils/codemirror-rich-markdoc/prosePlugins/proseCalloutPlugin.ts
 import {Decoration, type DecorationSet, EditorView, WidgetType} from '@codemirror/view';
 import { StateField, RangeSet } from '@codemirror/state';
 import { syntaxTree } from '@codemirror/language';

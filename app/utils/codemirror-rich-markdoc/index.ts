@@ -1,16 +1,13 @@
-// ~/utils/codemirror-rich-markdoc/index.ts
 import { ViewPlugin } from '@codemirror/view';
 import { syntaxHighlighting } from '@codemirror/language';
-import { markdown } from '@codemirror/lang-markdown'; // Import GFM if not already
-import {GFM, Subscript, Superscript, Emoji, Table, TaskList, Autolink, Strikethrough} from '@lezer/markdown';
-// import {GFM} from "@lezer/markdown"; // Already present in user's index.ts
+import { markdown } from '@codemirror/lang-markdown';
+import {GFM} from '@lezer/markdown';
 
-import tagParser from './parsers/tagParser'; // Your Markdoc tag parser
+import tagParser from './parsers/markdocTagParser';
 import highlightStyle from './highlightStyle';
 import RichEditPlugin from './richEdit';
 import renderBlock from './renderBlock';
 
-// Import new OFM Lezer Parsers
 import { commentParser } from './parsers/commentParser';
 import { footnoteParser } from './parsers/footnoteParser';
 import obsHashtagParser from './parsers/hashtagParser'; // Default export
@@ -21,9 +18,7 @@ import { texParser } from './parsers/texParser';
 import { yamlFrontmatterParser } from './parsers/yamlFrontmatterParser';
 
 import type { Config } from '@markdoc/markdoc';
-// import {blockquoteParser} from "~/utils/codemirror-rich-markdoc/parsers/blockquoteParser";
 import {calloutParser} from "~/utils/codemirror-rich-markdoc/parsers/calloutParser";
-// import hashtagParser from "~/utils/codemirror-rich-markdoc/parsers/hashtagParser"; // This is now obsHashtagParser
 
 export type MarkdocPluginConfig = { lezer?: any, markdoc: Config };
 
@@ -37,7 +32,7 @@ export default function (config: MarkdocPluginConfig) {
         markParser,
         taskListParser, // This Lezer parser defines Task nodes
         texParser,
-        tagParser, // Your Markdoc specific tag parser
+        tagParser,
         // blockquoteParser,
         calloutParser,
     ];

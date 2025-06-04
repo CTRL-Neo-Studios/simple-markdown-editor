@@ -1,4 +1,3 @@
-// ~/utils/codemirror-rich-markdoc/parsers/calloutParser.ts
 import { BlockContext, Line, type MarkdownConfig, Element } from '@lezer/markdown';
 import {Tag} from "@lezer/highlight";
 

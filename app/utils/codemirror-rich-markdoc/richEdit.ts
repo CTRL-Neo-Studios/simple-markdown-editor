@@ -3,10 +3,6 @@ import { syntaxTree } from '@codemirror/language';
 import type { DecorationSet, ViewUpdate } from '@codemirror/view';
 import type { Range } from '@codemirror/state';
 
-// Existing hidden decoration if needed for other things,
-// but for marks we'll use replace.
-// const decorationHidden = Decoration.mark({ class: 'cm-markdoc-hidden' }); [10]
-
 // Tokens for inline formatting marks whose visibility depends on parent node's active state
 const toggleableMarkTokens = [
     'HeaderMark',      // For #, ## etc.
@@ -20,7 +16,6 @@ const toggleableMarkTokens = [
 // Tokens that are *always* hidden (or replaced), like CodeInfo in FencedCode
 const alwaysHiddenTokens = [
     'CodeInfo', // Usually good to hide the language string like 'js'
-    // 'LinkSpecificURL', // If you have a Markdoc extension or custom parsing for URLs you always want to hide.
 ];
 
 

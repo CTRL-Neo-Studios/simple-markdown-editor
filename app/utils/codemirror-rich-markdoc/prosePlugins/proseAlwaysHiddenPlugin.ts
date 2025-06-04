@@ -1,12 +1,8 @@
-// ~/utils/codemirror-rich-markdoc/prosePlugins/alwaysHiddenPlugin.ts
 import {Decoration, type DecorationSet, EditorView} from '@codemirror/view';
 import { StateField, RangeSet } from '@codemirror/state';
 import { syntaxTree } from '@codemirror/language';
 import type { EditorState, Range as EditorRange } from '@codemirror/state';
 
-// Tokens that are *always* hidden.
-// Ensure 'CodeInfo' is NOT listed here if codeBlockStylePlugin handles it.
-// Add other tokens if needed, e.g., 'LinkSpecificURL' from your original list.
 const alwaysHiddenTokens = [
     'CodeInfo',
     // 'LinkSpecificURL',

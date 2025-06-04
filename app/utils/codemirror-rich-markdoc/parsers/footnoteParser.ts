@@ -1,4 +1,3 @@
-// ~/utils/codemirror-rich-markdoc/parsers/footnoteParser.ts
 import type { MarkdownConfig, BlockContext, InlineContext, LeafBlock, LeafBlockParser, Line } from '@lezer/markdown';
 import {Tag} from "@lezer/highlight";
 

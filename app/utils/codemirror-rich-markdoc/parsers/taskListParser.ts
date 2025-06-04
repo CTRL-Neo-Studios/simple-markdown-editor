@@ -1,4 +1,3 @@
-// ~/utils/codemirror-rich-markdoc/parsers/taskListParser.ts
 import type { MarkdownConfig, BlockContext, LeafBlock, LeafBlockParser } from '@lezer/markdown';
 import {Tag} from "@lezer/highlight";
 

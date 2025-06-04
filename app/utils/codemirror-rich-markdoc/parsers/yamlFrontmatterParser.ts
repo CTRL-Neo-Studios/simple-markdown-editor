@@ -1,4 +1,3 @@
-// ~/utils/codemirror-rich-markdoc/parsers/yamlFrontmatterParser.ts
 import type { Input } from "@lezer/common"; // Added import
 import type { MarkdownConfig, BlockContext, Line } from '@lezer/markdown';
 import {Tag} from "@lezer/highlight";

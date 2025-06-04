@@ -1,4 +1,3 @@
-// ~/utils/codemirror-rich-markdoc/prosePlugins/listMarkPlugin.ts
 import {Decoration, type DecorationSet, EditorView} from '@codemirror/view';
 import { StateField, RangeSet } from '@codemirror/state';
 import { syntaxTree } from '@codemirror/language';

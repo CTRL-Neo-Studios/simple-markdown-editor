@@ -1,4 +1,3 @@
-
 import markdoc from '@markdoc/markdoc';
 import type { Config } from '@markdoc/markdoc';
 

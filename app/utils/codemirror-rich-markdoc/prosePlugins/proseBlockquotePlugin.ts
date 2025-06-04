@@ -1,12 +1,9 @@
-// ~/utils/codemirror-rich-markdoc/prosePlugins/proseBlockquotePlugin.ts
 import {Decoration, type DecorationSet, EditorView} from '@codemirror/view';
 import { StateField, RangeSet } from '@codemirror/state';
 import { syntaxTree } from '@codemirror/language';
 import type { EditorState, Range as EditorRange, Line as EditorLine } from '@codemirror/state'; // Keep EditorRange
 import type { SyntaxNode } from '@lezer/common';
 
-// Helper function to check if a node range is active (cursor is within)
-// You can move this to a shared utils file if used elsewhere
 function isNodeRangeActive(state: EditorState, nodeFrom: number, nodeTo: number): boolean {
     const cursor = state.selection.main;
     if (cursor.empty) {

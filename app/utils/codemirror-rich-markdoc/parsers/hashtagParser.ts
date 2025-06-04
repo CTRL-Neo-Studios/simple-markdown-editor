@@ -1,5 +1,3 @@
-// ~/utils/codemirror-rich-markdoc/parsers/hashtagParser.ts
-// (Replaces your existing hashtagParser.ts)
 import { Tag, tags as t } from '@lezer/highlight';
 import type { MarkdownConfig, InlineContext } from '@lezer/markdown';
 

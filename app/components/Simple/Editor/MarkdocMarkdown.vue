@@ -32,12 +32,9 @@ import {drawSelection, EditorView, highlightActiveLine, keymap, rectangularSelec
 import markdocConfig from "~/utils/codemirror-rich-markdoc/markdocConfig";
 import {defaultKeymap, history, historyKeymap, indentWithTab} from "@codemirror/commands";
 import {defaultHighlightStyle, indentOnInput, syntaxHighlighting} from "@codemirror/language";
-import highlightStyle from "~/utils/codemirror-rich-markdoc/highlightStyle";
 import {horizontalRulePlugin} from "~/utils/codemirror-rich-markdoc/renderHorizontalRule";
-import {headingRenderPlugin} from "~/utils/codemirror-rich-markdoc/renderHeading";
 import {lineStylingPlugin} from "~/utils/codemirror-rich-markdoc/lineStyling";
 import {codeBlockStylePlugin} from "~/utils/codemirror-rich-markdoc/codeBlockStylePlugin";
-import {clickRevealOnMouseUpPlugin} from "~/utils/codemirror-rich-markdoc/clickRevealOnMouseUp";
 import {proseAlwaysHiddenPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseAlwaysHiddenPlugin";
 import {proseMarkdocTagPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseMarkdocTagPlugin";
 import {proseToggleableMarksPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseToggleableMarksPlugins";

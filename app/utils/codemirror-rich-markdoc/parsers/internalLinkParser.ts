@@ -1,4 +1,3 @@
-// ~/utils/codemirror-rich-markdoc/parsers/internalLinkParser.ts
 import type { MarkdownConfig, InlineContext, Element } from '@lezer/markdown';
 import {Tag} from "@lezer/highlight";
 

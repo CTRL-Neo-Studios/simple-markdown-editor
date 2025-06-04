@@ -1,4 +1,3 @@
-// ~/utils/codemirror-rich-markdoc/prosePlugins/widgets/TaskCheckboxWidget.ts
 import { WidgetType } from '@codemirror/view';
 import type { EditorView } from '@codemirror/view';
 

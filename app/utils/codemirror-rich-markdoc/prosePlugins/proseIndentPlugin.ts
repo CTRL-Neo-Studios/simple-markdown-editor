@@ -1,4 +1,3 @@
-// ~/utils/codemirror-rich-markdoc/prosePlugins/indentPlugin.ts
 import {Decoration, type DecorationSet, EditorView} from '@codemirror/view';
 import { StateField, RangeSet } from '@codemirror/state';
 import type { EditorState, Range as EditorRange } from '@codemirror/state';

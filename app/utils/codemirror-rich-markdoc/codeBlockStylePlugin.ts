@@ -5,8 +5,6 @@ import type { EditorState, Range as EditorRange } from '@codemirror/state';
 import type { DecorationSet } from '@codemirror/view';
 import {EndFenceWidget, LanguageFlairWidget} from "~/utils/codemirror-rich-markdoc/codeBlockWidgets";
 
-// Import WidgetType and the widget classes defined above (LanguageFlairWidget, EndFenceWidget)
-
 function buildCodeBlockDecorations(state: EditorState): EditorRange<Decoration>[] {
     const decorations: EditorRange<Decoration>[] = [];
     const cursor = state.selection.main; // For checking cursor position
