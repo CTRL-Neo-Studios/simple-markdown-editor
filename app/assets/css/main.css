@@ -161,7 +161,71 @@
     }
 
     .cm-callout-widget {
-        @apply mx-2 p-2 rounded-lg border border-primary/20 bg-primary/20 relative; /* Removed transition-all from parent to be more specific */
+        @apply mx-2 p-2 rounded-lg border relative; /* Removed transition-all from parent to be more specific */
+
+        .callout-title {
+            @apply flex items-center justify-start gap-1.5 font-extrabold;
+        }
+
+        &[callout-type='default'] {
+            @apply border-primary/20 bg-primary/20;
+
+            .callout-title {
+                @apply text-primary-400;
+            }
+
+            .callout-title-foldable {
+                @apply text-primary-400;
+            }
+        }
+
+        &[callout-type='info'] {
+            @apply border-info/20 bg-info/20;
+
+            .callout-title {
+                @apply text-info-400;
+            }
+
+            .callout-title-foldable {
+                @apply text-info-400;
+            }
+        }
+
+        &[callout-type='warning'] {
+            @apply border-warning/20 bg-warning/20;
+
+            .callout-title {
+                @apply text-warning-400;
+            }
+
+            .callout-title-foldable {
+                @apply text-warning-400;
+            }
+        }
+
+        &[callout-type='error'] {
+            @apply border-error/20 bg-error/20;
+
+            .callout-title {
+                @apply text-error-400;
+            }
+
+            .callout-title-foldable {
+                @apply text-error-400;
+            }
+        }
+
+        &[callout-type='highlight'] {
+            @apply border-accented bg-accented;
+
+            .callout-title {
+                @apply text-highlighted;
+            }
+
+            .callout-title-foldable {
+                @apply text-highlighted;
+            }
+        }
 
         .callout-content {
             @apply overflow-hidden opacity-100 transition-all duration-300;
@@ -189,10 +253,6 @@
                     @apply -rotate-90;
                 }
             }
-        }
-
-        .callout-title {
-            @apply flex items-center justify-start gap-1.5 font-extrabold text-primary-400;
         }
 
         .edit-block-button {

@@ -92,7 +92,7 @@ export class CalloutWidget extends WidgetType {
         const widgetRoot = document.createElement('div');
         widgetRoot.className = `cm-callout-widget callout callout-${this.type.toLowerCase()}`;
         widgetRoot.setAttribute('contenteditable', 'false');
-        widgetRoot.setAttribute('callout-type', 'info');
+        widgetRoot.setAttribute('callout-type', 'default');
         widgetRoot.dataset.callout = this.type.toLowerCase();
         if (this.fold) {
             // Set initial fold state based on '+' (closed by default in reading view, but widget can interpret differently)
@@ -107,10 +107,19 @@ export class CalloutWidget extends WidgetType {
 
         const iconDiv = document.createElement('div');
         iconDiv.className = 'callout-icon';
-        let iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`;
+        let iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15V10m0-3h.01"></path></svg>`;
         if (this.type.toLowerCase().includes('note') || this.type.toLowerCase().includes('info')) {
             iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15V10m0-3h.01"></path></svg>`;
-            widgetRoot.setAttribute('callout-type', this.type.toLowerCase());
+            widgetRoot.setAttribute('callout-type', 'info');
+        } else if (this.type.toLowerCase().includes('warning') || this.type.toLowerCase().includes('alert') || this.type.toLowerCase().includes('be advised')) {
+            iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-triangle-alert"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>`
+            widgetRoot.setAttribute('callout-type', 'warning');
+        } else if (this.type.toLowerCase().includes('error')) {
+            iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-x"><circle cx="12" cy="12" r="10"></circle><path d="m15 9-6 6"></path><path d="m9 9 6 6"></path></svg>`
+            widgetRoot.setAttribute('callout-type', 'error');
+        } else if (this.type.toLowerCase().includes('crucial') || this.type.toLowerCase().includes('important')) {
+            iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-flame"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>`
+            widgetRoot.setAttribute('callout-type', 'highlight');
         }
         iconDiv.innerHTML = iconSvg;
 
