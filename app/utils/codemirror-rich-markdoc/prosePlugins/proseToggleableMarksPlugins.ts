@@ -6,7 +6,7 @@ import type { EditorState, Range as EditorRange } from '@codemirror/state';
 
 const toggleableMarkTokens = [
     'HeaderMark',
-    'QuoteMark',
+    // 'QuoteMark',
     'EmphasisMark',
     'StrikethroughMark',
     // 'TaskMarker',
@@ -47,8 +47,8 @@ function buildDecorations(state: EditorState): EditorRange<Decoration>[] {
 
             if (inFencedCode) return false;
 
-            if(node.name == 'Hashtag') {
-                console.log('ok')
+            if (node.name == 'QuoteMark') {
+                return isNodeRangeActive(state, node.from, node.to);
             }
 
             if (toggleableMarkTokens.includes(node.name)) {

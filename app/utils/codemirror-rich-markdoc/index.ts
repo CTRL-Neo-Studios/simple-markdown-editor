@@ -21,6 +21,8 @@ import { texParser } from './parsers/texParser';
 import { yamlFrontmatterParser } from './parsers/yamlFrontmatterParser';
 
 import type { Config } from '@markdoc/markdoc';
+// import {blockquoteParser} from "~/utils/codemirror-rich-markdoc/parsers/blockquoteParser";
+import {calloutParser} from "~/utils/codemirror-rich-markdoc/parsers/calloutParser";
 // import hashtagParser from "~/utils/codemirror-rich-markdoc/parsers/hashtagParser"; // This is now obsHashtagParser
 
 export type MarkdocPluginConfig = { lezer?: any, markdoc: Config };
@@ -36,6 +38,8 @@ export default function (config: MarkdocPluginConfig) {
         taskListParser, // This Lezer parser defines Task nodes
         texParser,
         tagParser, // Your Markdoc specific tag parser
+        // blockquoteParser,
+        calloutParser,
     ];
 
     const mergedConfig = {
@@ -44,8 +48,8 @@ export default function (config: MarkdocPluginConfig) {
             GFM,
             // Order can be important. Parsers with 'before'/'after' help,
             // but generally, more specific or overriding parsers come first.
-            ...ofmLezerExtensions,
             { remove: ["SetextHeading"] }, // GFM provides base Markdown + GitHub features (includes its own TaskList, Strikethrough, Table)
+            ...ofmLezerExtensions,
                  // The `taskListParser` above is designed to work with GFM's ListItem.
             ...(config.lezer?.extensions ?? []) // Any other extensions passed in
         ],
