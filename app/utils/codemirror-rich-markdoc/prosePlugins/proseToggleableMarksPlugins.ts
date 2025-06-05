@@ -46,6 +46,18 @@ function buildDecorations(state: EditorState): EditorRange<Decoration>[] {
 
             if (inFencedCode) return false;
 
+            const cursor = state.selection.main
+            const cursorLineNum = state.doc.lineAt(cursor.from).number;
+            const nodeLineNum = state.doc.lineAt(node.from).number;
+
+            // if (node.name === 'QuoteMark') {
+            //     if (nodeLineNum !== cursorLineNum) {
+            //         decorations.push(Decoration.replace({}).range(node.from, node.to + 1));
+            //     }
+            //     return;
+            // }
+
+
             if (toggleableMarkTokens.includes(node.name)) {
                 const parentNode = node.node.parent;
                 if (parentNode) {
