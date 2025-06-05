@@ -14,6 +14,7 @@
                 @blur="log('blur', $event)"
                 class="w-full h-full"
             />
+            <UButton @click="iterate()" label="iterate"/>
         </ClientOnly>
     </div>
 </template>
@@ -25,7 +26,6 @@ import { basicSetup } from 'codemirror';
 import { EditorState } from '@codemirror/state';
 import type { Config as MarkdocConfig } from '@markdoc/markdoc';
 import { languages } from '@codemirror/language-data';
-import {GFM, Subscript, Superscript, Emoji, Table, TaskList, Autolink, Strikethrough} from '@lezer/markdown';
 
 import richMarkdocPlugin from '~/utils/codemirror-rich-markdoc';
 import {drawSelection, EditorView, highlightActiveLine, keymap, rectangularSelection} from "@codemirror/view";
@@ -44,6 +44,7 @@ import {proseInternalLinkPlugin} from "~/utils/codemirror-rich-markdoc/prosePlug
 import {proseHashtagWrapperPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseHashtagWrapperPlugin";
 import {proseBlockquotePlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseBlockquotePlugin";
 import {proseCalloutPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseCalloutPlugin";
+import {calloutEnterKeymap} from "~/utils/codemirror-rich-markdoc/keymaps/calloutKeymap";
 // import {proseListStylingPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseListStylingPlugin";
 
 const props = defineProps<{class?: string}>()

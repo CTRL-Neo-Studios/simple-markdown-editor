@@ -60,18 +60,14 @@ export default class RichEditPlugin implements PluginValue {
                     const nodeFrom = node.from;
                     const nodeTo = node.to;
 
-                    // 1. Handle always hidden tokens
                     if (alwaysHiddenTokens.includes(nodeName)) {
                         widgets.push(Decoration.replace({}).range(nodeFrom, nodeTo));
                         return; // Done with this node
                     }
 
-                    // 2. Handle toggleable marks based on parent's active state
                     if (toggleableMarkTokens.includes(nodeName)) {
                         const parentNode = node.node.parent;
                         if (parentNode) {
-                            // Determine the full range of the parent formatting node
-                            // (e.g., for EmphasisMark, parentNode is Emphasis/StrongEmphasis)
                             const parentFrom = parentNode.from;
                             const parentTo = parentNode.to;
 
@@ -84,12 +80,6 @@ export default class RichEditPlugin implements PluginValue {
                                     // Lezer GFM often includes the space in HeaderMark.
                                 }
                                 widgets.push(Decoration.replace({}).range(nodeFrom, markEnd));
-                            } else {
-                                // Parent is ACTIVE: do nothing, let the mark be visible
-                                // and styled by the syntaxHighlighting theme.
-                                // Obsidian's active header DOM suggests this:
-                                // <span class="cm-formatting cm-formatting-header...">#&nbsp;</span>
-                                // This is just a styled span, not a widget.
                             }
                         }
                         return; // Done with this mark node
@@ -104,8 +94,6 @@ export default class RichEditPlugin implements PluginValue {
                     }
 
                     if (nodeName === 'FencedCode') { // [10]
-                        // This is likely handled by codeBlockStylePlugin
-                        // widgets.push(Decoration.mark({ class: 'cm-markdoc-code' }).range(nodeFrom, nodeTo)); [12]
                         return false; // Don't iterate into FencedCode if handled by another plugin
                     }
 

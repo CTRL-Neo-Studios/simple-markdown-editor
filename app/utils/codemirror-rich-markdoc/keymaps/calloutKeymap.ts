@@ -1,9 +1,9 @@
 import { Prec } from '@codemirror/state';
-import { keymap } from '@codemirror/view';
+import {type KeyBinding, keymap} from '@codemirror/view';
 import { syntaxTree } from '@codemirror/language';
 import { indentUnit } from '@codemirror/language'; // For indentation string
 
-export const calloutEnterKeymap = Prec.high(keymap.of([
+export const calloutEnterKeymap = [
     {
         key: 'Enter',
         run: (view): boolean => {
@@ -70,4 +70,4 @@ export const calloutEnterKeymap = Prec.high(keymap.of([
             return false; // Not handled, default Enter behavior
         },
     },
-]));
+] as KeyBinding[];

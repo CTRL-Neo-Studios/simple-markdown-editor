@@ -46,10 +46,6 @@ function buildDecorations(state: EditorState): EditorRange<Decoration>[] {
 
             if (inFencedCode) return false;
 
-            if (node.name == 'QuoteMark') {
-                return isNodeRangeActive(state, node.from, node.to);
-            }
-
             if (toggleableMarkTokens.includes(node.name)) {
                 const parentNode = node.node.parent;
                 if (parentNode) {
