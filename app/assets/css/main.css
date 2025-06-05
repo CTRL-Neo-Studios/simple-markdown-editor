@@ -33,19 +33,19 @@
 .cm-content {
     @apply font-sans;
 
-    .prose-cm-h1 {
+    .prose-cm-h1, h1 {
         @apply decoration-0 scroll-m-20 text-3xl! font-extrabold tracking-tight lg:text-4xl text-(--prose-headings);
     }
 
-    .prose-cm-h2 {
+    .prose-cm-h2, h2 {
         @apply decoration-0 scroll-m-20 pb-2 text-2xl! font-semibold tracking-tight transition-colors first:mt-0 text-(--prose-headings);
     }
 
-    .prose-cm-h3 {
+    .prose-cm-h3, h3 {
         @apply decoration-0 scroll-m-20 text-xl! font-semibold tracking-tight text-(--prose-headings);
     }
 
-    .prose-cm-h4, .prose-cm-h5, .prose-cm-h6 {
+    .prose-cm-h4, h4, .prose-cm-h5, h5, .prose-cm-h6, h6 {
         @apply decoration-0 scroll-m-20 text-lg! font-semibold tracking-tight text-(--prose-headings);
     }
 
@@ -57,19 +57,19 @@
         @apply font-mono text-sm!;
     }
 
-    .prose-cm-link {
+    .prose-cm-link, a {
         @apply underline text-primary;
     }
 
-    .prose-cm-strong {
+    .prose-cm-strong, strong {
         @apply font-bold;
     }
 
-    .prose-cm-strikethrough {
+    .prose-cm-strikethrough, strike {
         @apply line-through;
     }
 
-    .prose-cm-horizontalrule {
+    .prose-cm-horizontalrule, br {
         @apply text-dimmed;
         /* Or your preferred style */
     }
@@ -161,97 +161,101 @@
     }
 
     .cm-callout-widget {
-        @apply mx-2 p-2 rounded-lg border relative; /* Removed transition-all from parent to be more specific */
+        @apply p-2 relative flex flex-col; /* Removed transition-all from parent to be more specific */
 
-        .callout-title {
-            @apply flex items-center justify-start gap-1.5 font-extrabold;
-        }
-
-        &[callout-type='default'] {
-            @apply border-primary/20 bg-primary/20;
+        .callout {
+            @apply flex flex-col rounded-lg border p-2 border-primary/20 bg-primary/20;
 
             .callout-title {
-                @apply text-primary-400;
+                @apply flex items-center justify-start gap-1.5 font-extrabold p-0 m-0 h-fit w-full text-primary-400;
+
+                .callout-title-icon {
+                    @apply flex hidden;
+                }
             }
 
-            .callout-title-foldable {
-                @apply text-primary-400;
+            .callout-content {
+                @apply overflow-hidden opacity-100 transition-all duration-300 w-full flex flex-col gap-1;
+            }
+
+            &[data-callout='info'] {
+                @apply border-info/20 bg-info/20;
+
+                .callout-title {
+                    @apply text-info-400;
+                }
+            }
+
+            &.[data-callout='warning'] {
+                @apply border-warning/20 bg-warning/20;
+
+                .callout-title {
+                    @apply text-warning-400;
+                }
+            }
+
+            &[data-callout='error'] {
+                @apply border-error/20 bg-error/20;
+
+                .callout-title {
+                    @apply text-error-400;
+                }
+            }
+
+            &[data-callout='highlight'] {
+                @apply border-accented bg-accented;
+
+                .callout-title {
+                    @apply text-highlighted;
+                }
             }
         }
 
         &[callout-type='info'] {
-            @apply border-info/20 bg-info/20;
-
-            .callout-title {
-                @apply text-info-400;
-            }
-
-            .callout-title-foldable {
+            .callout-fold {
                 @apply text-info-400;
             }
         }
 
         &[callout-type='warning'] {
-            @apply border-warning/20 bg-warning/20;
-
-            .callout-title {
-                @apply text-warning-400;
-            }
-
-            .callout-title-foldable {
+            .callout-fold {
                 @apply text-warning-400;
             }
         }
 
         &[callout-type='error'] {
-            @apply border-error/20 bg-error/20;
-
-            .callout-title {
-                @apply text-error-400;
-            }
-
-            .callout-title-foldable {
+            .callout-fold {
                 @apply text-error-400;
             }
         }
 
         &[callout-type='highlight'] {
-            @apply border-accented bg-accented;
-
-            .callout-title {
-                @apply text-highlighted;
-            }
-
-            .callout-title-foldable {
+            .callout-fold {
                 @apply text-highlighted;
             }
         }
 
-        .callout-content {
-            @apply overflow-hidden opacity-100 transition-all duration-300;
+        .callout-fold {
+            @apply rounded hover:bg-elevated transition duration-200 cursor-pointer text-primary font-sans text-center align-middle rotate-0 p-1;
+
+            svg {
+                @apply transition-transform duration-300 ease-in-out;
+            }
         }
 
-        &[data-callout-fold='closed'] {
+        &[data-fold-state='closed'] {
             .callout-content {
                 @apply max-h-0 opacity-0 p-0;
             }
-
-            .callout-title-foldable {
-                svg {
-                    @apply rotate-0;
-                }
-            }
         }
 
-        &[data-callout-fold='open'] {
+        &[data-fold-state='open'] {
             .callout-content {
                 @apply max-h-none opacity-100 py-1 mt-1;
             }
-            .callout-title-foldable {
-                svg {
-                    /* Original chevron-left direction */
-                    @apply -rotate-90;
-                }
+
+            .callout-fold {
+                @apply -rotate-90;
             }
         }
 
@@ -261,19 +265,8 @@
             @apply rounded hover:bg-elevated transition duration-200 cursor-pointer p-1 font-sans text-dimmed;
         }
 
-        .callout-title-foldable { /* This is the fold button container */
-            /* duration-200 is already good for hover */
-            @apply rounded hover:bg-elevated transition duration-200 cursor-pointer text-primary p-1 font-sans z-10 text-center align-middle;
-
-            svg {
-                /* Add transition for the transform property on the SVG. */
-                /* This prepares it for smooth animation if the SVG element itself is not replaced by JS. */
-                @apply transition-transform duration-300 ease-in-out; /* inline-block helps ensure transform works as expected */
-            }
-        }
-
         .editing-utils-container {
-            @apply top-1 right-1 font-sans text-dimmed absolute flex items-center justify-center gap-1 p-1;
+            @apply top-2 right-2 font-sans text-dimmed absolute flex items-center justify-center gap-1 p-1;
         }
     }
 
@@ -377,74 +370,6 @@
     background-repeat: no-repeat;
     background-position: center;
     background-size: 75%;
-}
-
-.cm-markdoc-renderBlock {
-    @apply font-sans;
-
-    h1 {
-        @apply scroll-m-20 text-3xl font-extrabold tracking-tight lg:text-4xl text-(--prose-headings) ;
-    }
-
-    h2 {
-        @apply scroll-m-20 border-b border-(--ui-border) pb-2 text-2xl font-semibold tracking-tight transition-colors first:mt-0 text-(--prose-headings);
-    }
-
-    h3 {
-        @apply scroll-m-20 text-xl font-semibold tracking-tight text-(--prose-headings);
-    }
-
-    h4 {
-        @apply scroll-m-20 text-lg font-semibold tracking-tight text-(--prose-headings);
-    }
-
-    p {
-        @apply leading-7 [&:not(:first-child)]:mt-3 text-sm text-(--prose-body);
-    }
-
-    strong {
-        @apply font-bold text-(--prose-bold);
-    }
-
-    em {
-        @apply text-(--prose-captions)
-    }
-
-    table {
-        @apply w-full text-sm my-2;
-    }
-
-    tr {
-        @apply m-0 border-t border-(--ui-border-muted) p-0 even:bg-(--ui-bg-muted) text-sm;
-    }
-
-    th {
-        @apply border border-(--ui-border-muted) px-4 py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right text-sm;
-    }
-
-    td {
-        @apply border border-(--ui-border-muted) px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right text-sm;
-    }
-
-    ul {
-        @apply my-6 ml-6 list-disc [&>li]:mt-2 text-sm text-(--prose-bullets);
-    }
-
-    pre {
-        @apply bg-(--ui-bg-inverted) rounded-lg font-mono -z-20 p-4 mt-3;
-
-        code {
-            @apply rounded px-0 py-0 mx-0 my-0 font-mono dark:text-(--ui-text-dimmed) bg-transparent text-xs font-semibold z-10;
-        }
-    }
-
-    code {
-        @apply relative rounded bg-(--ui-bg-muted) text-(--prose-code) px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold -z-10;
-    }
-
-    small {
-        @apply text-sm font-medium leading-none text-(--prose-body)/70;
-    }
 }
 
 .cm-cursor {

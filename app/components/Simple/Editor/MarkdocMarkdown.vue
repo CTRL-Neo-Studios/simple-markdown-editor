@@ -45,6 +45,8 @@ import {proseHashtagWrapperPlugin} from "~/utils/codemirror-rich-markdoc/prosePl
 import {proseBlockquotePlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseBlockquotePlugin";
 import {proseCalloutPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseCalloutPlugin";
 import {calloutEnterKeymap} from "~/utils/codemirror-rich-markdoc/keymaps/calloutKeymap";
+import {proseExpCalloutPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseExpCalloutPlugin";
+import {calloutRenderField} from "~/utils/codemirror-rich-markdoc/prosePlugins/calloutRenderField";
 // import {proseListStylingPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseListStylingPlugin";
 
 const props = defineProps<{class?: string}>()
@@ -87,7 +89,9 @@ onMounted(() => {
         proseInternalLinkPlugin,
         proseHashtagWrapperPlugin,
         // proseBlockquotePlugin,
-        proseCalloutPlugin,
+        // proseCalloutPlugin,
+        proseExpCalloutPlugin,
+        calloutRenderField,
 
         richPluginInstance,
 

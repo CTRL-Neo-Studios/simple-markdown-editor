@@ -46,6 +46,8 @@
 		"@markdoc/markdoc": "^0.5.2",
 		"@tauri-apps/cli": "^2.5.0",
 		"eslint": "^9.27.0",
+		"markdown-it-obsidian-callouts": "^0.3.2",
 		"typescript": "^5.8.3"
-	}
+	},
+	"packageManager": "pnpm@10.11.1"
 }
