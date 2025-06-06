@@ -26,7 +26,6 @@
 		"@vueuse/nuxt": "13.2.0",
 		"codemirror": "^6.0.1",
 		"nuxt": "^3.17.4",
-		"nuxt-auth-utils": "0.5.20",
 		"remark-frontmatter": "^5.0.0",
 		"remark-gfm": "^4.0.1",
 		"remark-math": "^6.0.0",

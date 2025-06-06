@@ -4,7 +4,6 @@ export default defineNuxtConfig({
 
     modules: [
       "@nuxt/ui",
-      "nuxt-auth-utils",
       "@vueuse/nuxt",
       "@nuxt/image",
       "@nuxt/icon",
