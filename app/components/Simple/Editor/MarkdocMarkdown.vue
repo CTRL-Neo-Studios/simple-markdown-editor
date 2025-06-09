@@ -14,7 +14,7 @@
                 @blur="log('blur', $event)"
                 class="w-full h-full"
             />
-            <UButton @click="iterate()" label="iterate"/>
+<!--            <UButton @click="iterate()" label="iterate"/>-->
         </ClientOnly>
     </div>
 </template>
@@ -42,16 +42,13 @@ import {proseListMarkPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/
 import {proseIndentPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseIndentPlugin";
 import {proseInternalLinkPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseInternalLinkPlugin";
 import {proseHashtagWrapperPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseHashtagWrapperPlugin";
-import {proseBlockquotePlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseBlockquotePlugin";
-import {proseCalloutPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseCalloutPlugin";
-import {calloutEnterKeymap} from "~/utils/codemirror-rich-markdoc/keymaps/calloutKeymap";
 import {proseExpCalloutPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseExpCalloutPlugin";
 import {calloutRenderField} from "~/utils/codemirror-rich-markdoc/prosePlugins/calloutRenderField";
 // import {proseListStylingPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseListStylingPlugin";
 
 const props = defineProps<{class?: string}>()
 
-const doc = ref(``);
+const doc = defineModel();
 
 const extensions = shallowRef<any[]>([]);
 const view = shallowRef<EditorView>();
@@ -84,12 +81,9 @@ onMounted(() => {
         proseMarkdocTagPlugin,
         proseToggleableMarksPlugin,
         proseListMarkPlugin,
-        // proseListStylingPlugin,
         proseIndentPlugin,
         proseInternalLinkPlugin,
         proseHashtagWrapperPlugin,
-        // proseBlockquotePlugin,
-        // proseCalloutPlugin,
         proseExpCalloutPlugin,
         calloutRenderField,
 
