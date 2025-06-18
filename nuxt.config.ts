@@ -2,6 +2,8 @@
 export default defineNuxtConfig({
     devtools: {enabled: true},
 
+    css: ["~/assets/css/main.css"],
+
     modules: [
       "@nuxt/ui",
       "@vueuse/nuxt",
@@ -10,8 +12,6 @@ export default defineNuxtConfig({
       "@nuxt/fonts",
       "@nuxtjs/i18n",
     ],
-
-    css: ["~/assets/css/main.css"],
 
     future: {
         compatibilityVersion: 4,

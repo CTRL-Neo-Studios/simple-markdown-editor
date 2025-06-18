@@ -50,6 +50,8 @@
 	},
 	"packageManager": "pnpm@10.12.1",
 	"pnpm": {
-		"neverBuiltDependencies": []
+		"onlyBuiltDependenciesFile": [
+			"@parcel/watcher", "@tailwindcss/oxide", "esbuild", "sharp", "vue-demi"
+		]
 	}
 }

@@ -186,7 +186,7 @@
                 }
             }
 
-            &.[data-callout='warning'] {
+            &[data-callout='warning'] {
                 @apply border-warning/20 bg-warning/20;
 
                 .callout-title {

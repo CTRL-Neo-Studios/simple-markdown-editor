@@ -1,26 +1,30 @@
 <template>
     <div :class="props.class ? props.class : 'w-full h-full'">
         <ClientOnly>
-            <CodeMirror
-                v-model="doc"
-                placeholder="Start typing your markdown content here..."
-                :autofocus="true"
-                :indent-with-tab="true"
-                :tab-size="2"
-                :extensions="extensions"
-                @ready="handleReady"
-                @change="log('change', $event)"
-                @focus="log('focus', $event)"
-                @blur="log('blur', $event)"
-                class="w-full h-full"
-            />
-<!--            <UButton @click="iterate()" label="iterate"/>-->
+            <div class="w-full">
+                <CodeMirror
+                    v-model="doc"
+                    placeholder="Start typing your markdown content here..."
+                    :autofocus="true"
+                    :indent-with-tab="true"
+                    :tab-size="4"
+                    :extensions="extensions"
+                    @ready="handleReady"
+                    @change="log('change', $event)"
+                    @focus="log('focus', $event)"
+                    @blur="log('blur', $event)"
+                    class="w-full h-full"
+                />
+            </div>
+            <UButton @click="iterate()" label="iterate"/>
+            <div class="grid grid-cols-1 gap-2 py-2">
+                <div v-for="(content, index) in ast" :key="index">{{content}}</div>
+            </div>
         </ClientOnly>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, onMounted } from 'vue';
 import CodeMirror from 'vue-codemirror6';
 import { basicSetup } from 'codemirror';
 import { EditorState } from '@codemirror/state';
@@ -48,7 +52,7 @@ import {calloutRenderField} from "~/utils/codemirror-rich-markdoc/prosePlugins/c
 
 const props = defineProps<{class?: string}>()
 
-const doc = defineModel();
+const doc = defineModel<string>();
 
 const extensions = shallowRef<any[]>([]);
 const view = shallowRef<EditorView>();
@@ -99,14 +103,15 @@ onMounted(() => {
     ];
 });
 
+const ast = ref([])
+
 function iterate() {
+    ast.value = []
     view.value?.state?.tree.iterate({
         from: 0,
         to: view.value.state.doc.length,
         enter(node) {
-            console.log(
-                `Node: ${node.name}, From: ${node.from}, To: ${node.to}, Text: "${view.value?.state.doc.sliceString(node.from, node.to)}"`
-            );
+            ast.value.push(`Node: ${node.name}, From: ${node.from}, To: ${node.to}, Text: "${view.value?.state.doc.sliceString(node.from, node.to)}"`)
             // To see highlight tags (more advanced, may need to inspect CM internals or a debug extension)
             // For now, node.name is the most critical.
         }

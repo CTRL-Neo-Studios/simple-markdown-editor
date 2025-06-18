@@ -62,8 +62,9 @@ export default function (config: MarkdocPluginConfig) {
             markdown(mergedConfig) // The core markdown extension with all parsers
         ],
         eventHandlers: {
-            mousedown(event, view) {
-                if (event.target instanceof Element && event.target.matches('.cm-markdoc-renderBlock *'))
+            mouseup(event, view) {
+                // if (event.target instanceof Element && event.target.matches('.cm-markdoc-renderBlock *'))
+                if (event.target instanceof Element)
                     view.dispatch({ selection: { anchor: view.posAtDOM(event.target) } });
             }
         }
