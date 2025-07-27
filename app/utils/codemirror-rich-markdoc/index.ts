@@ -10,7 +10,7 @@ import renderBlock from './renderBlock';
 
 import { commentParser } from './parsers/commentParser';
 import { footnoteParser } from './parsers/footnoteParser';
-import obsHashtagParser from './parsers/hashtagParser'; // Default export
+import { obsHashtagParser } from './parsers/hashtagParser'; // Default export
 import { internalLinkParser } from './parsers/internalLinkParser';
 import { markParser } from './parsers/markParser';
 import { taskListParser } from './parsers/taskListParser';
@@ -38,15 +38,12 @@ export default function (config: MarkdocPluginConfig) {
     ];
 
     const mergedConfig = {
-        ...config.lezer ?? {}, // Spreads user-passed lezer config (like codeLanguages)
+        ...config.lezer ?? {},
         extensions: [
             GFM,
-            // Order can be important. Parsers with 'before'/'after' help,
-            // but generally, more specific or overriding parsers come first.
-            { remove: ["SetextHeading"] }, // GFM provides base Markdown + GitHub features (includes its own TaskList, Strikethrough, Table)
+            { remove: ["SetextHeading"] }, // I fuckin hate Setext Headers. Also it conflicts with linebreaks
             ...ofmLezerExtensions,
-                 // The `taskListParser` above is designed to work with GFM's ListItem.
-            ...(config.lezer?.extensions ?? []) // Any other extensions passed in
+            ...(config.lezer?.extensions ?? [])
         ],
         nested: { // For Markdoc tag parsing primarily
             blockquote: true,
@@ -57,7 +54,7 @@ export default function (config: MarkdocPluginConfig) {
     return ViewPlugin.fromClass(RichEditPlugin, {
         decorations: v => v.decorations,
         provide: v => [
-            renderBlock(config.markdoc), // Your Markdoc renderBlock widget
+            renderBlock(config.markdoc), // Markdoc renderBlock widget
             syntaxHighlighting(highlightStyle),
             markdown(mergedConfig) // The core markdown extension with all parsers
         ],
