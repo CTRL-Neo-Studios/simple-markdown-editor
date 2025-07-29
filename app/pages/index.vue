@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import SimpleEditorMarkdocMarkdown from "~/components/Simple/Editor/MarkdocMarkdown.vue";
+import type {InternalLink} from "~/utils/codemirror-rich-markdoc/config";
 
 const doc = ref(`
 # This is a test document
@@ -8,25 +9,25 @@ Here is an external link: [Google](https://www.google.com)
 
 Here is an internal link: [[My Note]]
 
-Here is an embed: ![[Another Note]]
+Here is an image embed: ![[Kthalatir.png]]
+
+Here is a note embed: ![[Another Note]]
 `);
 
-interface InternalLinkMap {
-    internalLinkName: string;
-    filePath?: string;
-    redirectToPath: string;
-}
-
-const internalLinkMap = ref<InternalLinkMap[]>([
+const internalLinkMap = ref<InternalLink[]>([
     {
         internalLinkName: "My Note",
         redirectToPath: "/notes/my-note",
     },
     {
         internalLinkName: "Another Note",
-        filePath: "/path/to/another/note.md",
         redirectToPath: "/notes/another-note",
     },
+    {
+        internalLinkName: "Kthalatir.png",
+        filePath: "/Kthalatir.png",
+        redirectToPath: "/images/kthalatir",
+    }
 ]);
 
 const router = useRouter();
@@ -48,6 +49,6 @@ const handleExternalLinkClick = (detail: { url: string, text?: string }) => {
 
 <template>
     <div class="w-screen h-screen">
-        <SimpleEditorMarkdocMarkdown v-model="doc" @internal-link-click="handleInternalLinkClick" @external-link-click="handleExternalLinkClick"/>
+        <SimpleEditorMarkdocMarkdown v-model="doc" :internal-link-map="internalLinkMap" @internal-link-click="handleInternalLinkClick" @external-link-click="handleExternalLinkClick"/>
     </div>
 </template>

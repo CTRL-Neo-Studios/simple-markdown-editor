@@ -23,15 +23,21 @@
 <script setup lang="ts">
 import CodeMirror from 'vue-codemirror6';
 import { basicSetup } from 'codemirror';
-import { EditorState } from '@codemirror/state';
+import {EditorState} from "@codemirror/state";
 import type { Config as MarkdocConfig } from '@markdoc/markdoc';
 import {languages} from '@codemirror/language-data';
 import {syntaxTree} from "@codemirror/language";
+import {Compartment} from "@codemirror/state";
 
 import richMarkdocPlugin from '~/utils/codemirror-rich-markdoc';
-import {drawSelection, EditorView, highlightActiveLine, keymap, rectangularSelection} from "@codemirror/view";
+import {keymap, highlightActiveLine, drawSelection, rectangularSelection, EditorView} from "@codemirror/view";
 import markdocConfig from "~/utils/codemirror-rich-markdoc/markdocConfig";
-import {defaultKeymap, history, historyKeymap, indentWithTab} from "@codemirror/commands";
+import {
+    defaultKeymap,
+    history,
+    historyKeymap,
+    indentWithTab
+} from "@codemirror/commands";
 import {defaultHighlightStyle, indentOnInput, syntaxHighlighting} from "@codemirror/language";
 import {horizontalRulePlugin} from "~/utils/codemirror-rich-markdoc/renderHorizontalRule";
 import {lineStylingPlugin} from "~/utils/codemirror-rich-markdoc/lineStyling";
@@ -47,9 +53,10 @@ import {proseHashtagWrapperPlugin} from "~/utils/codemirror-rich-markdoc/prosePl
 import {proseExpCalloutPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseExpCalloutPlugin";
 import {calloutRenderField} from "~/utils/codemirror-rich-markdoc/prosePlugins/calloutRenderField";
 import {linkClickPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/linkClickPlugin";
-// import {proseListStylingPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseListStylingPlugin";
+import {internalLinkMapFacet, type InternalLink} from "~/utils/codemirror-rich-markdoc/config";
+import {ref, watch, shallowRef, onMounted, onBeforeUnmount} from "vue";
 
-const props = defineProps<{class?: string}>()
+const props = defineProps<{class?: string, internalLinkMap?: InternalLink[]}>()
 const emit = defineEmits(['internal-link-click', 'external-link-click']);
 
 const doc = defineModel<string>();
@@ -57,6 +64,15 @@ const doc = defineModel<string>();
 const extensions = shallowRef<any[]>([]);
 const view = shallowRef<EditorView>();
 const editorEl = ref<HTMLElement>();
+const internalLinkCompartment = new Compartment();
+
+watch(() => props.internalLinkMap, (newMap) => {
+    if (view.value) {
+        view.value.dispatch({
+            effects: internalLinkCompartment.reconfigure(internalLinkMapFacet.of(newMap || []))
+        });
+    }
+}, { deep: true });
 
 const handleReady = (payload: any) => {
     view.value = payload.view;
@@ -67,17 +83,7 @@ const log = (...args: any) => {
 };
 
 onMounted(() => {
-    // The richMarkdocPlugin is a function that returns the actual CodeMirror ViewPlugin
-    // It also provides other extensions like markdown() and syntaxHighlighting()
-    const richPluginInstance = richMarkdocPlugin({
-        markdoc: markdocConfig,
-        lezer: {
-            codeLanguages: languages,
-            extensions: [],
-        }
-    });
-
-    extensions.value = [
+    const initialExtensions = [
         EditorView.lineWrapping,
         horizontalRulePlugin,
         lineStylingPlugin,
@@ -93,17 +99,24 @@ onMounted(() => {
         proseExpCalloutPlugin,
         calloutRenderField,
         linkClickPlugin,
-
-        richPluginInstance,
-
         history(),
         drawSelection(),
         rectangularSelection(),
-        // highlightActiveLine(),
         indentOnInput(),
         syntaxHighlighting(defaultHighlightStyle),
         keymap.of([indentWithTab, ...defaultKeymap, ...historyKeymap]),
+        internalLinkCompartment.of(internalLinkMapFacet.of(props.internalLinkMap || []))
     ];
+
+    const richPluginInstance = richMarkdocPlugin({
+        markdoc: markdocConfig,
+        lezer: {
+            codeLanguages: languages,
+            extensions: [],
+        }
+    });
+
+    extensions.value = [...initialExtensions, richPluginInstance];
 
     if (editorEl.value) {
         editorEl.value.addEventListener('internal-link-click', handleInternalLinkClick as EventListener);

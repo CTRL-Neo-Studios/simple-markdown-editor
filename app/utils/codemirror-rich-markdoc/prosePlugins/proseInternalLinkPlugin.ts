@@ -3,6 +3,8 @@ import { StateField, RangeSet } from '@codemirror/state';
 import { syntaxTree } from '@codemirror/language';
 import type { EditorState, Range as EditorRange } from '@codemirror/state';
 import type { SyntaxNode } from '@lezer/common';
+import {internalLinkMapFacet} from '../config';
+import {ImageEmbedWidget} from "./widget/ImageEmbedWidget";
 
 function isNodeRangeActive(state: EditorState, nodeFrom: number, nodeTo: number): boolean {
     const cursor = state.selection.main;
@@ -15,73 +17,90 @@ function isNodeRangeActive(state: EditorState, nodeFrom: number, nodeTo: number)
 
 function buildInternalLinkDecorations(state: EditorState): EditorRange<Decoration>[] {
     const decorations: EditorRange<Decoration>[] = [];
+    const linkMap = state.facet(internalLinkMapFacet);
+    const widgets: EditorRange<Decoration>[] = [];
 
     syntaxTree(state).iterate({
         enter(node) {
-            const isEmbed = node.name === 'Embed';
-            const isInternalLink = node.name === 'InternalLink';
+            if (node.name === 'Embed') {
+                const pathNode = node.node.getChild('InternalLink')?.getChild('InternalPath');
+                if (pathNode) {
+                    const path = state.doc.sliceString(pathNode.from, pathNode.to);
+                    const linkInfo = linkMap.find(l => l.internalLinkName === path);
 
-            if (isInternalLink || isEmbed) {
-                const mainNode = node.node;
-                const isActive = isNodeRangeActive(state, mainNode.from, mainNode.to);
+                    if (linkInfo?.filePath && /\.(png|jpg|jpeg|gif|svg|webp)$/i.test(linkInfo.filePath)) {
+                        const line = state.doc.lineAt(node.from);
+                        widgets.push(Decoration.widget({
+                            widget: new ImageEmbedWidget(linkInfo.filePath),
+                            block: true,
+                            side: 1
+                        }).range(line.to));
 
-                if (!isActive) {
-                    const contentContainerNode = isEmbed ? mainNode.getChild('InternalLink') : mainNode;
-
-                    if (contentContainerNode) {
-                        const pathNode = contentContainerNode.getChild('InternalPath');
-                        if (pathNode) {
-                            const path = state.doc.sliceString(pathNode.from, pathNode.to);
-                            const subpathNode = contentContainerNode.getChild('InternalSubpath');
-                            const aliasNode = contentContainerNode.getChild('InternalDisplay');
-
-                            const subpath = subpathNode ? state.doc.sliceString(subpathNode.from, subpathNode.to) : undefined;
-                            const alias = aliasNode ? state.doc.sliceString(aliasNode.from, aliasNode.to) : undefined;
-                            
-                            const linkAttributes: { [key: string]: string } = {
-                                'class': 'cm-link',
-                                'href': '#',
-                                'data-internal-link': 'true',
-                                'data-path': path,
-                                'data-type': isEmbed ? 'embed' : 'internal-link'
-                            };
-
-                            if (subpath) linkAttributes['data-subpath'] = subpath;
-                            if (alias) linkAttributes['data-display'] = alias;
-
-                            // For embeds, hide the '!'
-                            if (isEmbed) {
-                                const embedMark = mainNode.getChild('EmbedMark');
-                                if (embedMark) {
-                                    decorations.push(Decoration.replace({}).range(embedMark.from, embedMark.to));
-                                }
-                            }
-
-                            // The rest of the logic for hiding syntax and applying the link
-                            if (aliasNode) {
-                                decorations.push(Decoration.mark({ tagName: 'a', attributes: linkAttributes }).range(aliasNode.from, aliasNode.to));
-                                decorations.push(Decoration.replace({}).range(pathNode.from, pathNode.to));
-                                if (subpathNode) {
-                                    decorations.push(Decoration.replace({}).range(subpathNode.from, subpathNode.to));
-                                }
-                            } else {
-                                const linkStart = pathNode.from;
-                                const linkEnd = subpathNode ? subpathNode.to : pathNode.to;
-                                decorations.push(Decoration.mark({ tagName: 'a', attributes: linkAttributes }).range(linkStart, linkEnd));
-                            }
-
-                            contentContainerNode.getChildren('InternalMark').forEach(mark => {
-                                decorations.push(Decoration.replace({}).range(mark.from, mark.to));
-                            });
+                        if (!isNodeRangeActive(state, node.from, node.to)) {
+                            decorations.push(Decoration.replace({}).range(node.from, node.to));
                         }
+                        return false;
                     }
                 }
+            }
+
+            if (node.name === 'InternalLink' || node.name === 'Embed') {
+                const mainNode = node.node;
+                const isActive = isNodeRangeActive(state, mainNode.from, mainNode.to);
+                if (isActive) return;
+
+                const contentContainerNode = node.name === 'Embed' ? mainNode.getChild('InternalLink') : mainNode;
+                if (!contentContainerNode) return;
+
+                const pathNode = contentContainerNode.getChild('InternalPath');
+                if (!pathNode) return;
+
+                const path = state.doc.sliceString(pathNode.from, pathNode.to);
+                const subpathNode = contentContainerNode.getChild('InternalSubpath');
+                const aliasNode = contentContainerNode.getChild('InternalDisplay');
+                const subpath = subpathNode ? state.doc.sliceString(subpathNode.from, subpathNode.to) : undefined;
+                const alias = aliasNode ? state.doc.sliceString(aliasNode.from, aliasNode.to) : undefined;
+
+                const linkAttributes: { [key: string]: string } = {
+                    'class': 'cm-link',
+                    'href': '#',
+                    'data-internal-link': 'true',
+                    'data-path': path,
+                    'data-type': node.name === 'Embed' ? 'embed' : 'internal-link'
+                };
+
+                if (subpath) linkAttributes['data-subpath'] = subpath;
+                if (alias) linkAttributes['data-display'] = alias;
+
+                if (node.name === 'Embed') {
+                    const embedMark = mainNode.getChild('EmbedMark');
+                    if (embedMark) {
+                        decorations.push(Decoration.replace({}).range(embedMark.from, embedMark.to));
+                    }
+                }
+
+                if (aliasNode) {
+                    decorations.push(Decoration.mark({ tagName: 'a', attributes: linkAttributes }).range(aliasNode.from, aliasNode.to));
+                    decorations.push(Decoration.replace({}).range(pathNode.from, pathNode.to));
+                    if (subpathNode) {
+                        decorations.push(Decoration.replace({}).range(subpathNode.from, subpathNode.to));
+                    }
+                } else {
+                    const linkStart = pathNode.from;
+                    const linkEnd = subpathNode ? subpathNode.to : pathNode.to;
+                    decorations.push(Decoration.mark({ tagName: 'a', attributes: linkAttributes }).range(linkStart, linkEnd));
+                }
+
+                contentContainerNode.getChildren('InternalMark').forEach(mark => {
+                    decorations.push(Decoration.replace({}).range(mark.from, mark.to));
+                });
+
                 return false;
             }
         }
     });
 
-    return decorations;
+    return [...decorations, ...widgets];
 }
 
 export { isNodeRangeActive };
