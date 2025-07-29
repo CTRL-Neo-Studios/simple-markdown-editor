@@ -1,15 +1,32 @@
 import {EditorView} from "@codemirror/view";
+import {syntaxTree} from "@codemirror/language";
 
 export const linkClickPlugin = EditorView.domEventHandlers({
     mousedown(event, view) {
-        const anchor = (event.target as HTMLElement).closest('a.cm-link') as HTMLAnchorElement;
+        let target = event.target as HTMLElement;
+
+        const imageEmbed = target.closest('.internal-embed');
+        if (imageEmbed) {
+            const posData = (imageEmbed as HTMLElement).dataset;
+            if (posData.embedPos) {
+                const from = posData.selectionFrom ? parseInt(posData.selectionFrom, 10) : parseInt(posData.embedPos, 10);
+                const to = posData.selectionTo ? parseInt(posData.selectionTo, 10) : syntaxTree(view.state).resolve(from, -1).to;
+                
+                view.dispatch({
+                    selection: { anchor: from, head: to }
+                });
+                return true;
+            }
+        }
+
+        const anchor = target.closest('a.cm-link') as HTMLAnchorElement;
 
         if (!anchor) {
-            return false; // Not a link, let CM handle it.
+            return false;
         }
 
         if (anchor.dataset.internalLink === 'true') {
-            event.preventDefault(); // Prevent navigation to '#'
+            event.preventDefault();
             view.dom.dispatchEvent(new CustomEvent('internal-link-click', {
                 bubbles: true,
                 composed: true,
@@ -32,8 +49,6 @@ export const linkClickPlugin = EditorView.domEventHandlers({
             }));
         }
         
-        // For both internal and external links, we want to tell CM that we've handled it
-        // so it doesn't try to move the cursor.
         return true;
     },
 }); 

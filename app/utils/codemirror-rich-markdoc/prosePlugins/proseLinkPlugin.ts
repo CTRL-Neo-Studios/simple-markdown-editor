@@ -3,28 +3,29 @@ import {StateField, RangeSet} from '@codemirror/state';
 import {syntaxTree} from '@codemirror/language';
 import type {EditorState, Range as EditorRange} from '@codemirror/state';
 import {isNodeRangeActive} from "./proseInternalLinkPlugin";
+import {ImageEmbedWidget} from './widget/ImageEmbedWidget';
 
 function buildLinkDecorations(state: EditorState): EditorRange<Decoration>[] {
     const decorations: EditorRange<Decoration>[] = [];
+    const widgets: EditorRange<Decoration>[] = [];
 
     syntaxTree(state).iterate({
         enter({node}) {
-            if (node.name === 'URL' && node.parent?.name !== 'Link') {
-                const isActive = isNodeRangeActive(state, node.from, node.to);
-                if (!isActive) {
-                    const url = state.doc.sliceString(node.from, node.to);
-                    decorations.push(Decoration.mark({
-                        tagName: 'a',
-                        attributes: {
-                            href: url,
-                            target: '_blank',
-                            class: 'cm-link',
-                            'data-external-link': 'true',
-                            'data-url': url
-                        }
-                    }).range(node.from, node.to));
+            if (node.name === 'Image') {
+                const urlNode = node.getChild('URL');
+                if (urlNode) {
+                    const url = state.doc.sliceString(urlNode.from, urlNode.to);
+                    const line = state.doc.lineAt(node.from);
+                    widgets.push(Decoration.widget({
+                        widget: new ImageEmbedWidget(url, node.from, urlNode.from, urlNode.to),
+                        block: true,
+                        side: 1
+                    }).range(line.to));
                 }
-            } else if (node.name === 'Link') {
+                return false;
+            }
+            
+            if (node.name === 'Link') {
                 const isActive = isNodeRangeActive(state, node.from, node.to);
                 if (!isActive) {
                     const allMarks = node.getChildren('LinkMark');
@@ -48,24 +49,50 @@ function buildLinkDecorations(state: EditorState): EditorRange<Decoration>[] {
                             'data-text': text
                         };
 
-                        // Hide markdown syntax
                         decorations.push(Decoration.replace({}).range(node.from, linkTextStart));
                         decorations.push(Decoration.replace({}).range(linkTextEnd, node.to));
 
-                        // Apply link to text
                         decorations.push(Decoration.mark({
                             tagName: 'a',
                             attributes: linkAttributes
                         }).range(linkTextStart, linkTextEnd));
 
-                        return false; // Don't process children of the Link node
+                        return false;
                     }
+                }
+                return false;
+            }
+
+            if (node.name === 'URL') {
+                const url = state.doc.sliceString(node.from, node.to);
+                const isImage = /\.(png|jpg|jpeg|gif|svg|webp)$/i.test(url) || url.includes('picsum.photos');
+
+                if (isImage) {
+                    const line = state.doc.lineAt(node.from);
+                    widgets.push(Decoration.widget({
+                        widget: new ImageEmbedWidget(url, node.from),
+                        block: true,
+                        side: 1
+                    }).range(line.to));
+                }
+
+                if (!isNodeRangeActive(state, node.from, node.to)) {
+                    decorations.push(Decoration.mark({
+                        tagName: 'a',
+                        attributes: {
+                            href: url,
+                            target: '_blank',
+                            class: 'cm-link',
+                            'data-external-link': 'true',
+                            'data-url': url
+                        }
+                    }).range(node.from, node.to));
                 }
             }
         }
     });
 
-    return decorations;
+    return [...decorations, ...widgets];
 }
 
 export const proseLinkPlugin = StateField.define<DecorationSet>({

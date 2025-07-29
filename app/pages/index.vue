@@ -12,6 +12,8 @@ Here is an internal link: [[My Note]]
 Here is an image embed: ![[Kthalatir.png]]
 
 Here is a note embed: ![[Another Note]]
+
+And here is a standard markdown image: ![picsum](https://picsum.photos/400/200)
 `);
 
 const internalLinkMap = ref<InternalLink[]>([

@@ -1,7 +1,7 @@
 import { WidgetType } from '@codemirror/view';
 
 export class ImageEmbedWidget extends WidgetType {
-    constructor(readonly src: string) {
+    constructor(readonly src: string, readonly pos: number, readonly selectionFrom?: number, readonly selectionTo?: number) {
         super();
     }
 
@@ -10,6 +10,12 @@ export class ImageEmbedWidget extends WidgetType {
         container.className = 'internal-embed media-embed image-embed is-loaded';
         container.tabIndex = -1;
         container.contentEditable = 'false';
+        container.dataset.embedPos = String(this.pos);
+
+        if (this.selectionFrom !== undefined && this.selectionTo !== undefined) {
+            container.dataset.selectionFrom = String(this.selectionFrom);
+            container.dataset.selectionTo = String(this.selectionTo);
+        }
 
         const img = document.createElement('img');
         img.src = this.src;
@@ -18,7 +24,8 @@ export class ImageEmbedWidget extends WidgetType {
         return container;
     }
 
-    override ignoreEvent() {
-        return true;
+    override ignoreEvent(event: Event): boolean {
+        // Allow mousedown events to be handled by our plugin
+        return !(event instanceof MouseEvent && event.type === 'mousedown');
     }
 } 

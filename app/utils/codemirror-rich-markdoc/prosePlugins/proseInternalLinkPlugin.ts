@@ -31,7 +31,7 @@ function buildInternalLinkDecorations(state: EditorState): EditorRange<Decoratio
                     if (linkInfo?.filePath && /\.(png|jpg|jpeg|gif|svg|webp)$/i.test(linkInfo.filePath)) {
                         const line = state.doc.lineAt(node.from);
                         widgets.push(Decoration.widget({
-                            widget: new ImageEmbedWidget(linkInfo.filePath),
+                            widget: new ImageEmbedWidget(linkInfo.filePath, node.from),
                             block: true,
                             side: 1
                         }).range(line.to));
