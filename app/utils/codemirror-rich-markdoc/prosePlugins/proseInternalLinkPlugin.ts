@@ -4,7 +4,7 @@ import { syntaxTree } from '@codemirror/language';
 import type { EditorState, Range as EditorRange } from '@codemirror/state';
 import type { SyntaxNode } from '@lezer/common';
 import {internalLinkMapFacet} from '../config';
-import {ImageEmbedWidget} from "./widget/ImageEmbedWidget";
+import {VueEmbedWidget} from "./widget/VueEmbedWidget";
 
 function isNodeRangeActive(state: EditorState, nodeFrom: number, nodeTo: number): boolean {
     const cursor = state.selection.main;
@@ -28,10 +28,15 @@ function buildInternalLinkDecorations(state: EditorState): EditorRange<Decoratio
                     const path = state.doc.sliceString(pathNode.from, pathNode.to);
                     const linkInfo = linkMap.find(l => l.internalLinkName === path);
 
-                    if (linkInfo?.filePath && /\.(png|jpg|jpeg|gif|svg|webp)$/i.test(linkInfo.filePath)) {
+                    if (linkInfo?.embedComponent) {
                         const line = state.doc.lineAt(node.from);
+                        const props: Record<string, any> = { linkData: linkInfo };
+                        if (linkInfo.filePath) {
+                            props.filePath = linkInfo.filePath;
+                        }
+
                         widgets.push(Decoration.widget({
-                            widget: new ImageEmbedWidget(linkInfo.filePath, node.from),
+                            widget: new VueEmbedWidget(linkInfo.embedComponent, props, node.from),
                             block: true,
                             side: 1
                         }).range(line.to));

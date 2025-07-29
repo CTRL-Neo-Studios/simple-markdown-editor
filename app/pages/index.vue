@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import SimpleEditorMarkdocMarkdown from "~/components/Simple/Editor/MarkdocMarkdown.vue";
 import type {InternalLink} from "~/utils/codemirror-rich-markdoc/config";
+import ImageEmbed from "~/components/Embeds/ImageEmbed.vue";
+import NoteEmbed from "~/components/Embeds/NoteEmbed.vue";
 
 const doc = ref(`
 # This is a test document
@@ -24,11 +26,13 @@ const internalLinkMap = ref<InternalLink[]>([
     {
         internalLinkName: "Another Note",
         redirectToPath: "/notes/another-note",
+        embedComponent: NoteEmbed,
     },
     {
         internalLinkName: "Kthalatir.png",
         filePath: "/Kthalatir.png",
         redirectToPath: "/images/kthalatir",
+        embedComponent: ImageEmbed,
     }
 ]);
 
