@@ -18,7 +18,7 @@ export default defineNuxtConfig({
     // Enable SSG
     ssr: false,
     // Enables the development server to be discoverable by other devices when running on iOS physical devices
-    devServer: {host: process.env.TAURI_DEV_HOST || "localhost"},
+    devServer: {host: process.env.TAURI_DEV_HOST || "localhost", port: 4000},
     vite: {
         // Better support for Tauri CLI output
         clearScreen: false,
