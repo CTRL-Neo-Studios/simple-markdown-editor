@@ -8,26 +8,57 @@ function buildLinkDecorations(state: EditorState): EditorRange<Decoration>[] {
     const decorations: EditorRange<Decoration>[] = [];
 
     syntaxTree(state).iterate({
-        enter(node) {
-            if (node.name === 'Link' || node.name === 'URL') {
+        enter({node}) {
+            if (node.name === 'URL' && node.parent?.name !== 'Link') {
                 const isActive = isNodeRangeActive(state, node.from, node.to);
-
                 if (!isActive) {
-                    if (node.name === 'URL') {
-                        const url = state.doc.sliceString(node.from, node.to);
+                    const url = state.doc.sliceString(node.from, node.to);
+                    decorations.push(Decoration.mark({
+                        tagName: 'a',
+                        attributes: {
+                            href: url,
+                            target: '_blank',
+                            class: 'cm-link',
+                            'data-external-link': 'true',
+                            'data-url': url
+                        }
+                    }).range(node.from, node.to));
+                }
+            } else if (node.name === 'Link') {
+                const isActive = isNodeRangeActive(state, node.from, node.to);
+                if (!isActive) {
+                    const allMarks = node.getChildren('LinkMark');
+                    const urlNode = node.getChild('URL');
+
+                    const openBracket = allMarks.find(m => state.doc.sliceString(m.from, m.to) === '[');
+                    const closeBracket = allMarks.find(m => state.doc.sliceString(m.from, m.to) === ']');
+
+                    if (urlNode && openBracket && closeBracket) {
+                        const linkTextStart = openBracket.to;
+                        const linkTextEnd = closeBracket.from;
+                        const url = state.doc.sliceString(urlNode.from, urlNode.to);
+                        const text = state.doc.sliceString(linkTextStart, linkTextEnd);
+
+                        const linkAttributes = {
+                            'href': url,
+                            'target': '_blank',
+                            'class': 'cm-link',
+                            'data-external-link': 'true',
+                            'data-url': url,
+                            'data-text': text
+                        };
+
+                        // Hide markdown syntax
+                        decorations.push(Decoration.replace({}).range(node.from, linkTextStart));
+                        decorations.push(Decoration.replace({}).range(linkTextEnd, node.to));
+
+                        // Apply link to text
                         decorations.push(Decoration.mark({
                             tagName: 'a',
-                            attributes: {href: url, target: '_blank', class: 'cm-link'}
-                        }).range(node.from, node.to));
-                    } else if (node.name === 'Link') {
-                        const urlNode = node.node.getChild('URL');
-                        if (urlNode) {
-                            const url = state.doc.sliceString(urlNode.from, urlNode.to);
-                            decorations.push(Decoration.mark({
-                                tagName: 'a',
-                                attributes: {href: url, target: '_blank', class: 'cm-link'}
-                            }).range(node.from, node.to));
-                        }
+                            attributes: linkAttributes
+                        }).range(linkTextStart, linkTextEnd));
+
+                        return false; // Don't process children of the Link node
                     }
                 }
             }

@@ -19,6 +19,16 @@ export const linkClickPlugin = EditorView.domEventHandlers({
                     display: anchor.dataset.display,
                 },
             }));
+        } else if (anchor.dataset.externalLink === 'true') {
+            event.preventDefault();
+            view.dom.dispatchEvent(new CustomEvent('external-link-click', {
+                bubbles: true,
+                composed: true,
+                detail: {
+                    url: anchor.dataset.url,
+                    text: anchor.dataset.text
+                }
+            }));
         }
         
         // For both internal and external links, we want to tell CM that we've handled it

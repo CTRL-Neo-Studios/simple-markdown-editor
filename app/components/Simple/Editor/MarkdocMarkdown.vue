@@ -50,7 +50,7 @@ import {linkClickPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/link
 // import {proseListStylingPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseListStylingPlugin";
 
 const props = defineProps<{class?: string}>()
-const emit = defineEmits(['internal-link-click']);
+const emit = defineEmits(['internal-link-click', 'external-link-click']);
 
 const doc = defineModel<string>();
 
@@ -107,12 +107,14 @@ onMounted(() => {
 
     if (editorEl.value) {
         editorEl.value.addEventListener('internal-link-click', handleInternalLinkClick as EventListener);
+        editorEl.value.addEventListener('external-link-click', handleExternalLinkClick as EventListener);
     }
 });
 
 onBeforeUnmount(() => {
     if (editorEl.value) {
         editorEl.value.removeEventListener('internal-link-click', handleInternalLinkClick as EventListener);
+        editorEl.value.removeEventListener('external-link-click', handleExternalLinkClick as EventListener);
     }
 });
 
@@ -120,6 +122,9 @@ const handleInternalLinkClick = (event: CustomEvent) => {
     emit('internal-link-click', event.detail);
 };
 
+const handleExternalLinkClick = (event: CustomEvent) => {
+    emit('external-link-click', event.detail);
+};
 </script>
 
 <style>

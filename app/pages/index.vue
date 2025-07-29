@@ -23,10 +23,16 @@ const handleInternalLinkClick = (detail: { path: string, subpath?: string, displ
         router.push(url);
     }
 };
+
+const handleExternalLinkClick = (detail: { url: string, text?: string }) => {
+    if (detail.url) {
+        window.open(detail.url, '_blank');
+    }
+};
 </script>
 
 <template>
     <div class="w-screen h-screen">
-        <SimpleEditorMarkdocMarkdown v-model="doc" :internal-link-map="internalLinkMap" @internal-link-click="handleInternalLinkClick"/>
+        <SimpleEditorMarkdocMarkdown v-model="doc" :internal-link-map="internalLinkMap" @internal-link-click="handleInternalLinkClick" @external-link-click="handleExternalLinkClick"/>
     </div>
 </template>
