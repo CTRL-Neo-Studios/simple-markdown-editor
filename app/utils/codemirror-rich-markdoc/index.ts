@@ -58,12 +58,12 @@ export default function (config: MarkdocPluginConfig) {
             syntaxHighlighting(highlightStyle),
             markdown(mergedConfig) // The core markdown extension with all parsers
         ],
-        eventHandlers: {
-            mouseup(event, view) {
-                // if (event.target instanceof Element && event.target.matches('.cm-markdoc-renderBlock *'))
-                if (event.target instanceof Element)
-                    view.dispatch({ selection: { anchor: view.posAtDOM(event.target) } });
-            }
-        }
+        // eventHandlers: {
+        //     mouseup(event, view) {
+        //         // if (event.target instanceof Element && event.target.matches('.cm-markdoc-renderBlock *'))
+        //         if (event.target instanceof Element)
+        //             view.dispatch({ selection: { anchor: view.posAtDOM(event.target) } });
+        //     }
+        // }
     });
 }

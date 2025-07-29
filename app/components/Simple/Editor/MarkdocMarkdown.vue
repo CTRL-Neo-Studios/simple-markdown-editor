@@ -1,5 +1,5 @@
 <template>
-    <div :class="props.class ? props.class : 'w-full h-full'">
+    <div :class="props.class ? props.class : 'w-full h-full'" ref="editorEl">
         <ClientOnly>
             <div class="w-full">
                 <CodeMirror
@@ -16,10 +16,6 @@
                     class="w-full h-full"
                 />
             </div>
-            <UButton @click="iterate()" label="iterate"/>
-            <div class="grid grid-cols-1 gap-2 py-2">
-                <div v-for="(content, index) in ast" :key="index">{{content}}</div>
-            </div>
         </ClientOnly>
     </div>
 </template>
@@ -29,7 +25,8 @@ import CodeMirror from 'vue-codemirror6';
 import { basicSetup } from 'codemirror';
 import { EditorState } from '@codemirror/state';
 import type { Config as MarkdocConfig } from '@markdoc/markdoc';
-import { languages } from '@codemirror/language-data';
+import {languages} from '@codemirror/language-data';
+import {syntaxTree} from "@codemirror/language";
 
 import richMarkdocPlugin from '~/utils/codemirror-rich-markdoc';
 import {drawSelection, EditorView, highlightActiveLine, keymap, rectangularSelection} from "@codemirror/view";
@@ -45,17 +42,21 @@ import {proseToggleableMarksPlugin} from "~/utils/codemirror-rich-markdoc/proseP
 import {proseListMarkPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseListMarkPlugin";
 import {proseIndentPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseIndentPlugin";
 import {proseInternalLinkPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseInternalLinkPlugin";
+import {proseLinkPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseLinkPlugin";
 import {proseHashtagWrapperPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseHashtagWrapperPlugin";
 import {proseExpCalloutPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseExpCalloutPlugin";
 import {calloutRenderField} from "~/utils/codemirror-rich-markdoc/prosePlugins/calloutRenderField";
+import {linkClickPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/linkClickPlugin";
 // import {proseListStylingPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/proseListStylingPlugin";
 
 const props = defineProps<{class?: string}>()
+const emit = defineEmits(['internal-link-click']);
 
 const doc = defineModel<string>();
 
 const extensions = shallowRef<any[]>([]);
 const view = shallowRef<EditorView>();
+const editorEl = ref<HTMLElement>();
 
 const handleReady = (payload: any) => {
     view.value = payload.view;
@@ -87,9 +88,11 @@ onMounted(() => {
         proseListMarkPlugin,
         proseIndentPlugin,
         proseInternalLinkPlugin,
+        proseLinkPlugin,
         proseHashtagWrapperPlugin,
         proseExpCalloutPlugin,
         calloutRenderField,
+        linkClickPlugin,
 
         richPluginInstance,
 
@@ -101,22 +104,21 @@ onMounted(() => {
         syntaxHighlighting(defaultHighlightStyle),
         keymap.of([indentWithTab, ...defaultKeymap, ...historyKeymap]),
     ];
+
+    if (editorEl.value) {
+        editorEl.value.addEventListener('internal-link-click', handleInternalLinkClick as EventListener);
+    }
 });
 
-const ast = ref([])
+onBeforeUnmount(() => {
+    if (editorEl.value) {
+        editorEl.value.removeEventListener('internal-link-click', handleInternalLinkClick as EventListener);
+    }
+});
 
-function iterate() {
-    ast.value = []
-    view.value?.state?.tree.iterate({
-        from: 0,
-        to: view.value.state.doc.length,
-        enter(node) {
-            ast.value.push(`Node: ${node.name}, From: ${node.from}, To: ${node.to}, Text: "${view.value?.state.doc.sliceString(node.from, node.to)}"`)
-            // To see highlight tags (more advanced, may need to inspect CM internals or a debug extension)
-            // For now, node.name is the most critical.
-        }
-    });
-}
+const handleInternalLinkClick = (event: CustomEvent) => {
+    emit('internal-link-click', event.detail);
+};
 
 </script>
 

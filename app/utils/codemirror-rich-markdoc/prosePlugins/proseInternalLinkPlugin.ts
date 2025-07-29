@@ -18,51 +18,57 @@ function buildInternalLinkDecorations(state: EditorState): EditorRange<Decoratio
 
     syntaxTree(state).iterate({
         enter(node) {
-            if (node.name === 'InternalLink' || node.name === 'Embed') {
-                const mainNode = node.node; // The InternalLink or Embed node
+            if (node.name === 'InternalLink') {
+                const mainNode = node.node;
                 const mainNodeFrom = mainNode.from;
                 const mainNodeTo = mainNode.to;
 
                 const isActive = isNodeRangeActive(state, mainNodeFrom, mainNodeTo);
 
                 if (!isActive) {
-                    let hasAlias = false;
-                    let aliasNode: SyntaxNode | null = null;
-                    let pathToHide: SyntaxNode | null = null;
-                    let subpathToHide: SyntaxNode | null = null;
-
-                    // Determine the node that actually contains Path, Subpath, Display
                     let contentContainerNode: SyntaxNode | null = null;
                     if (mainNode.name === 'InternalLink') {
                         contentContainerNode = mainNode;
-                    } else if (mainNode.name === 'Embed') {
-                        // For Embed, the Path/Subpath/Display are inside its InternalLink child
-                        contentContainerNode = mainNode.getChild('InternalLink');
                     }
 
                     if (contentContainerNode) {
-                        // Find InternalDisplay (alias)
-                        contentContainerNode.getChildren('InternalDisplay').forEach(child => {
-                            aliasNode = child;
-                            hasAlias = true;
-                        });
+                        const pathNode = contentContainerNode.getChild('InternalPath');
+                        const subpathNode = contentContainerNode.getChild('InternalSubpath');
+                        const aliasNode = contentContainerNode.getChild('InternalDisplay');
 
-                        if (hasAlias && aliasNode) {
-                            // Alias exists, find Path and Subpath to hide
-                            contentContainerNode.getChildren('InternalPath').forEach(pathN => {
-                                pathToHide = pathN;
-                            });
-                            contentContainerNode.getChildren('InternalSubpath').forEach(subpathN => {
-                                subpathToHide = subpathN;
-                            });
+                        if (pathNode) {
+                            const path = state.doc.sliceString(pathNode.from, pathNode.to);
+                            const subpath = subpathNode ? state.doc.sliceString(subpathNode.from, subpathNode.to) : undefined;
+                            const alias = aliasNode ? state.doc.sliceString(aliasNode.from, aliasNode.to) : undefined;
 
-                            if (pathToHide) {
-                                decorations.push(Decoration.replace({}).range(pathToHide.from, pathToHide.to));
-                            }
-                            if (subpathToHide) {
-                                decorations.push(Decoration.replace({}).range(subpathToHide.from, subpathToHide.to));
+                            const linkAttributes: { [key: string]: string } = {
+                                'href': '#',
+                                'data-internal-link': 'true',
+                                'data-path': path,
+                            };
+
+                            if (subpath) linkAttributes['data-subpath'] = subpath;
+                            if (alias) linkAttributes['data-display'] = alias;
+
+                            if (aliasNode) {
+                                // Has alias, linkify alias and hide path/subpath
+                                decorations.push(Decoration.mark({ tagName: 'a', attributes: linkAttributes }).range(aliasNode.from, aliasNode.to));
+                                decorations.push(Decoration.replace({}).range(pathNode.from, pathNode.to));
+                                if (subpathNode) {
+                                    decorations.push(Decoration.replace({}).range(subpathNode.from, subpathNode.to));
+                                }
+                            } else {
+                                // No alias, linkify path and subpath together
+                                const linkStart = pathNode.from;
+                                const linkEnd = subpathNode ? subpathNode.to : pathNode.to;
+                                decorations.push(Decoration.mark({ tagName: 'a', attributes: linkAttributes }).range(linkStart, linkEnd));
                             }
                         }
+
+                        // Hide all markers (`[[`, `]]`, `|`)
+                        contentContainerNode.getChildren('InternalMark').forEach(mark => {
+                            decorations.push(Decoration.replace({}).range(mark.from, mark.to));
+                        });
                     }
                 }
                 return false;
@@ -72,6 +78,8 @@ function buildInternalLinkDecorations(state: EditorState): EditorRange<Decoratio
 
     return decorations;
 }
+
+export { isNodeRangeActive };
 
 export const proseInternalLinkPlugin = StateField.define<DecorationSet>({
     create(state) {
