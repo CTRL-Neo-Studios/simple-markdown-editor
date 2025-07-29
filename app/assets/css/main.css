@@ -33,6 +33,12 @@
 .cm-content {
     @apply font-sans;
 
+    .cm-unresolved-link {
+        .prose-cm-internal-path {
+            @apply text-error/70!;
+        }
+    }
+
     .prose-cm-h1, h1 {
         @apply decoration-0 scroll-m-20 text-3xl! font-extrabold tracking-tight lg:text-4xl text-(--prose-headings);
 

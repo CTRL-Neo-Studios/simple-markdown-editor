@@ -185,4 +185,8 @@ div[contenteditable='true']:focus {
 .cm-link {
     cursor: pointer;
 }
+
+.cm-unresolved-link {
+    @apply text-primary/80;
+}
 </style>

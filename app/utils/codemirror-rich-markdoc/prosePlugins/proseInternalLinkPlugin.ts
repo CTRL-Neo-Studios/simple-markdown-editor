@@ -66,6 +66,13 @@ function buildInternalLinkDecorations(state: EditorState): EditorRange<Decoratio
                 const subpath = subpathNode ? state.doc.sliceString(subpathNode.from, subpathNode.to) : undefined;
                 const alias = aliasNode ? state.doc.sliceString(aliasNode.from, aliasNode.to) : undefined;
 
+                const linkInfo = linkMap.find(l => l.internalLinkName === path);
+
+                // Skip decoration if it's an embed that should be a widget
+                if (node.name === 'Embed' && linkInfo?.embedComponent) {
+                    return false;
+                }
+
                 const linkAttributes: { [key: string]: string } = {
                     'class': 'cm-link',
                     'href': '#',
@@ -73,6 +80,10 @@ function buildInternalLinkDecorations(state: EditorState): EditorRange<Decoratio
                     'data-path': path,
                     'data-type': node.name === 'Embed' ? 'embed' : 'internal-link'
                 };
+
+                if (!linkInfo) {
+                    linkAttributes['class'] += ' cm-unresolved-link';
+                }
 
                 if (subpath) linkAttributes['data-subpath'] = subpath;
                 if (alias) linkAttributes['data-display'] = alias;

@@ -16,6 +16,8 @@ Here is an image embed: ![[Kthalatir.png]]
 Here is a note embed: ![[Another Note]]
 
 And here is a standard markdown image: ![picsum](https://picsum.photos/400/200)
+
+This is an unresolved link: [[Unresolved Link]]
 `);
 
 const internalLinkMap = ref<InternalLink[]>([
