@@ -148,4 +148,8 @@ div[contenteditable='true']:focus {
 .cm-selectionBackground {
     @apply bg-primary/50! z-20;
 }
+
+.cm-link {
+    cursor: pointer;
+}
 </style>

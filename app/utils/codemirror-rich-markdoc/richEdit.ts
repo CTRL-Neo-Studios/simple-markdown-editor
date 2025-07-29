@@ -10,6 +10,8 @@ const toggleableMarkTokens = [
     'EmphasisMark',    // For * and _ in Emphasis, and ** and __ in StrongEmphasis
     'StrikethroughMark',// For ~~
     'TaskMarker',      // For [ ], [x]
+    'URL',
+    'LinkMark',
     // 'LinkMark' and 'URL' might be more complex if you want to show a rich link widget
 ];
 

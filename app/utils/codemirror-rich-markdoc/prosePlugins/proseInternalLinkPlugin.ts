@@ -42,6 +42,7 @@ function buildInternalLinkDecorations(state: EditorState): EditorRange<Decoratio
                             const alias = aliasNode ? state.doc.sliceString(aliasNode.from, aliasNode.to) : undefined;
 
                             const linkAttributes: { [key: string]: string } = {
+                                'class': 'cm-link',
                                 'href': '#',
                                 'data-internal-link': 'true',
                                 'data-path': path,

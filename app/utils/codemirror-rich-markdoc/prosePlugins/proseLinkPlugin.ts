@@ -17,7 +17,7 @@ function buildLinkDecorations(state: EditorState): EditorRange<Decoration>[] {
                         const url = state.doc.sliceString(node.from, node.to);
                         decorations.push(Decoration.mark({
                             tagName: 'a',
-                            attributes: {href: url, target: '_blank'}
+                            attributes: {href: url, target: '_blank', class: 'cm-link'}
                         }).range(node.from, node.to));
                     } else if (node.name === 'Link') {
                         const urlNode = node.node.getChild('URL');
@@ -25,7 +25,7 @@ function buildLinkDecorations(state: EditorState): EditorRange<Decoration>[] {
                             const url = state.doc.sliceString(urlNode.from, urlNode.to);
                             decorations.push(Decoration.mark({
                                 tagName: 'a',
-                                attributes: {href: url, target: '_blank'}
+                                attributes: {href: url, target: '_blank', class: 'cm-link'}
                             }).range(node.from, node.to));
                         }
                     }
