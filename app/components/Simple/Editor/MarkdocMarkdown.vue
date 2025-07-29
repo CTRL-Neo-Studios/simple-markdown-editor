@@ -55,6 +55,13 @@ import {calloutRenderField} from "~/utils/codemirror-rich-markdoc/prosePlugins/c
 import {linkClickPlugin} from "~/utils/codemirror-rich-markdoc/prosePlugins/linkClickPlugin";
 import {internalLinkMapFacet, type InternalLink} from "~/utils/codemirror-rich-markdoc/config";
 import {ref, watch, shallowRef, onMounted, onBeforeUnmount} from "vue";
+import {
+    autocompletion,
+    closeBrackets,
+    closeBracketsKeymap,
+    completionKeymap
+} from "@codemirror/autocomplete";
+import {internalLinkAutocomplete} from "~/utils/codemirror-rich-markdoc/internalLinkAutocomplete";
 
 const props = defineProps<{class?: string, internalLinkMap?: InternalLink[]}>()
 const emit = defineEmits(['internal-link-click', 'external-link-click']);
@@ -99,12 +106,20 @@ onMounted(() => {
         proseExpCalloutPlugin,
         calloutRenderField,
         linkClickPlugin,
+        autocompletion(),
+        internalLinkAutocomplete,
         history(),
         drawSelection(),
         rectangularSelection(),
         indentOnInput(),
         syntaxHighlighting(defaultHighlightStyle),
-        keymap.of([indentWithTab, ...defaultKeymap, ...historyKeymap]),
+        keymap.of([
+            ...closeBracketsKeymap,
+            ...defaultKeymap,
+            ...historyKeymap,
+            ...completionKeymap,
+            indentWithTab
+        ]),
         internalLinkCompartment.of(internalLinkMapFacet.of(props.internalLinkMap || []))
     ];
 
