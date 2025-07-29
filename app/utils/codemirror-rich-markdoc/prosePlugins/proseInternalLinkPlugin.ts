@@ -18,58 +18,62 @@ function buildInternalLinkDecorations(state: EditorState): EditorRange<Decoratio
 
     syntaxTree(state).iterate({
         enter(node) {
-            if (node.name === 'InternalLink') {
-                const mainNode = node.node;
-                const mainNodeFrom = mainNode.from;
-                const mainNodeTo = mainNode.to;
+            const isEmbed = node.name === 'Embed';
+            const isInternalLink = node.name === 'InternalLink';
 
-                const isActive = isNodeRangeActive(state, mainNodeFrom, mainNodeTo);
+            if (isInternalLink || isEmbed) {
+                const mainNode = node.node;
+                const isActive = isNodeRangeActive(state, mainNode.from, mainNode.to);
 
                 if (!isActive) {
-                    let contentContainerNode: SyntaxNode | null = null;
-                    if (mainNode.name === 'InternalLink') {
-                        contentContainerNode = mainNode;
-                    }
+                    const contentContainerNode = isEmbed ? mainNode.getChild('InternalLink') : mainNode;
 
                     if (contentContainerNode) {
                         const pathNode = contentContainerNode.getChild('InternalPath');
-                        const subpathNode = contentContainerNode.getChild('InternalSubpath');
-                        const aliasNode = contentContainerNode.getChild('InternalDisplay');
-
                         if (pathNode) {
                             const path = state.doc.sliceString(pathNode.from, pathNode.to);
+                            const subpathNode = contentContainerNode.getChild('InternalSubpath');
+                            const aliasNode = contentContainerNode.getChild('InternalDisplay');
+
                             const subpath = subpathNode ? state.doc.sliceString(subpathNode.from, subpathNode.to) : undefined;
                             const alias = aliasNode ? state.doc.sliceString(aliasNode.from, aliasNode.to) : undefined;
-
+                            
                             const linkAttributes: { [key: string]: string } = {
                                 'class': 'cm-link',
                                 'href': '#',
                                 'data-internal-link': 'true',
                                 'data-path': path,
+                                'data-type': isEmbed ? 'embed' : 'internal-link'
                             };
 
                             if (subpath) linkAttributes['data-subpath'] = subpath;
                             if (alias) linkAttributes['data-display'] = alias;
 
+                            // For embeds, hide the '!'
+                            if (isEmbed) {
+                                const embedMark = mainNode.getChild('EmbedMark');
+                                if (embedMark) {
+                                    decorations.push(Decoration.replace({}).range(embedMark.from, embedMark.to));
+                                }
+                            }
+
+                            // The rest of the logic for hiding syntax and applying the link
                             if (aliasNode) {
-                                // Has alias, linkify alias and hide path/subpath
                                 decorations.push(Decoration.mark({ tagName: 'a', attributes: linkAttributes }).range(aliasNode.from, aliasNode.to));
                                 decorations.push(Decoration.replace({}).range(pathNode.from, pathNode.to));
                                 if (subpathNode) {
                                     decorations.push(Decoration.replace({}).range(subpathNode.from, subpathNode.to));
                                 }
                             } else {
-                                // No alias, linkify path and subpath together
                                 const linkStart = pathNode.from;
                                 const linkEnd = subpathNode ? subpathNode.to : pathNode.to;
                                 decorations.push(Decoration.mark({ tagName: 'a', attributes: linkAttributes }).range(linkStart, linkEnd));
                             }
-                        }
 
-                        // Hide all markers (`[[`, `]]`, `|`)
-                        contentContainerNode.getChildren('InternalMark').forEach(mark => {
-                            decorations.push(Decoration.replace({}).range(mark.from, mark.to));
-                        });
+                            contentContainerNode.getChildren('InternalMark').forEach(mark => {
+                                decorations.push(Decoration.replace({}).range(mark.from, mark.to));
+                            });
+                        }
                     }
                 }
                 return false;

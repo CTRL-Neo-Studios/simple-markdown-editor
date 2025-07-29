@@ -17,6 +17,7 @@ export const linkClickPlugin = EditorView.domEventHandlers({
                     path: anchor.dataset.path,
                     subpath: anchor.dataset.subpath,
                     display: anchor.dataset.display,
+                    type: anchor.dataset.type,
                 },
             }));
         } else if (anchor.dataset.externalLink === 'true') {

@@ -8,19 +8,34 @@ Here is an external link: [Google](https://www.google.com)
 
 Here is an internal link: [[My Note]]
 
-Here is another internal link with an alias: [[Another Note|Click Here]]
+Here is an embed: ![[Another Note]]
 `);
 
-const internalLinkMap = ref({
-    "My Note": "/notes/my-note",
-    "Another Note": "/notes/another-note",
-});
+interface InternalLinkMap {
+    internalLinkName: string;
+    filePath?: string;
+    redirectToPath: string;
+}
+
+const internalLinkMap = ref<InternalLinkMap[]>([
+    {
+        internalLinkName: "My Note",
+        redirectToPath: "/notes/my-note",
+    },
+    {
+        internalLinkName: "Another Note",
+        filePath: "/path/to/another/note.md",
+        redirectToPath: "/notes/another-note",
+    },
+]);
 
 const router = useRouter();
-const handleInternalLinkClick = (detail: { path: string, subpath?: string, display?: string }) => {
-    const url = internalLinkMap.value[detail.path as keyof typeof internalLinkMap.value];
-    if (url) {
-        router.push(url);
+
+const handleInternalLinkClick = (detail: { path: string, subpath?: string, display?: string, type: 'internal-link' | 'embed' }) => {
+    console.log("Internal link clicked:", detail);
+    const link = internalLinkMap.value.find(l => l.internalLinkName === detail.path);
+    if (link) {
+        router.push(link.redirectToPath);
     }
 };
 
@@ -33,6 +48,6 @@ const handleExternalLinkClick = (detail: { url: string, text?: string }) => {
 
 <template>
     <div class="w-screen h-screen">
-        <SimpleEditorMarkdocMarkdown v-model="doc" :internal-link-map="internalLinkMap" @internal-link-click="handleInternalLinkClick" @external-link-click="handleExternalLinkClick"/>
+        <SimpleEditorMarkdocMarkdown v-model="doc" @internal-link-click="handleInternalLinkClick" @external-link-click="handleExternalLinkClick"/>
     </div>
 </template>
