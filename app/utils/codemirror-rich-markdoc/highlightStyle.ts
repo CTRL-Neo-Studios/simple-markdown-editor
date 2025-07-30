@@ -21,12 +21,12 @@ import {comment, commentMarker} from "~/utils/codemirror-rich-markdoc/parsers/co
 import {texBlock, texInline, texMarker} from "~/utils/codemirror-rich-markdoc/parsers/texParser";
 import {yamlContent, yamlFrontmatter, yamlMarker} from "~/utils/codemirror-rich-markdoc/parsers/yamlFrontmatterParser";
 // import {blockquote, quoteMark} from "~/utils/codemirror-rich-markdoc/parsers/blockquoteParser";
-import {
-    callout,
-    calloutFoldIndicator,
-    calloutMark, calloutTitleString,
-    calloutTypeString
-} from "~/utils/codemirror-rich-markdoc/parsers/calloutParser";
+// import {
+//     callout,
+//     calloutFoldIndicator,
+//     calloutMark, calloutTitleString,
+//     calloutTypeString
+// } from "~/utils/codemirror-rich-markdoc/parsers/calloutParser";
 
 export default HighlightStyle.define([
     { tag: t.heading, class: 'prose-cm-header-mark' },
@@ -91,9 +91,9 @@ export default HighlightStyle.define([
     { tag: t.quote, class: 'prose-cm-quote-mark prose-cm-meta' }, // For ">"
 
     // Callout specific styles
-    { tag: callout, class: 'prose-cm-callout' }, // Applied to the whole callout block
-    { tag: calloutMark, class: 'prose-cm-callout-mark prose-cm-meta' },
-    { tag: calloutTypeString, class: 'prose-cm-callout-type' },
-    { tag: calloutFoldIndicator, class: 'prose-cm-callout-fold prose-cm-meta' },
-    { tag: calloutTitleString, class: 'prose-cm-callout-title' },
+    // { tag: callout, class: 'prose-cm-callout' }, // Applied to the whole callout block
+    // { tag: calloutMark, class: 'prose-cm-callout-mark prose-cm-meta' },
+    // { tag: calloutTypeString, class: 'prose-cm-callout-type' },
+    // { tag: calloutFoldIndicator, class: 'prose-cm-callout-fold prose-cm-meta' },
+    // { tag: calloutTitleString, class: 'prose-cm-callout-title' },
 ]);

@@ -15,6 +15,10 @@
                     @blur="log('blur', $event)"
                     class="w-full h-full"
                 />
+                <UButton label="Iterate" @click="iterate"/>
+                <div class="grid grid-cols-1 gap-2 py-2">
+                    <div v-for="(content, index) in ast" :key="index">{{content}}</div>
+                </div>
             </div>
         </ClientOnly>
     </div>
@@ -62,6 +66,7 @@ import {
     completionKeymap
 } from "@codemirror/autocomplete";
 import {internalLinkAutocomplete} from "~/utils/codemirror-rich-markdoc/internalLinkAutocomplete";
+import {proseCalloutPlugin} from '~/utils/codemirror-rich-markdoc/prosePlugins/proseCalloutPlugin';
 
 const props = defineProps<{class?: string, internalLinkMap?: InternalLink[]}>()
 const emit = defineEmits(['internal-link-click', 'external-link-click']);
@@ -72,6 +77,7 @@ const extensions = shallowRef<any[]>([]);
 const view = shallowRef<EditorView>();
 const editorEl = ref<HTMLElement>();
 const internalLinkCompartment = new Compartment();
+const ast = ref([])
 
 watch(() => props.internalLinkMap, (newMap) => {
     if (view.value) {
@@ -103,8 +109,9 @@ onMounted(() => {
         proseInternalLinkPlugin,
         proseLinkPlugin,
         proseHashtagWrapperPlugin,
-        proseExpCalloutPlugin,
-        calloutRenderField,
+        proseCalloutPlugin,
+        // proseExpCalloutPlugin,
+        // calloutRenderField,
         linkClickPlugin,
         autocompletion(),
         internalLinkAutocomplete,
@@ -153,6 +160,22 @@ const handleInternalLinkClick = (event: CustomEvent) => {
 const handleExternalLinkClick = (event: CustomEvent) => {
     emit('external-link-click', event.detail);
 };
+
+function iterate() {
+    ast.value = []
+    //@ts-ignore
+    view.value?.state?.tree.iterate({
+        from: 0,
+        to: view.value.state.doc.length,
+        //@ts-ignore
+        enter(node) {
+            //@ts-ignore
+            ast.value.push(`Node: ${node.name}, From: ${node.from}, To: ${node.to}, Text: "${view.value?.state.doc.sliceString(node.from, node.to)}"`)
+            // To see highlight tags (more advanced, may need to inspect CM internals or a debug extension)
+            // For now, node.name is the most critical.
+        }
+    });
+}
 </script>
 
 <style>

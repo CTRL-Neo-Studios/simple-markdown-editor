@@ -1,153 +1,77 @@
-import { BlockContext, Line, type MarkdownConfig, Element } from '@lezer/markdown';
+import { type MarkdownConfig } from '@lezer/markdown';
 import { Tag } from "@lezer/highlight";
 
-// Regex to match callout definition lines, with nested blockquote support
-// Captures:
-// - indentation: leading whitespace
-// - quotePrefixes: one or more '>' with spaces (for nesting)
-// - type: the callout type inside [! and ]
-// - fold: optional fold indicator (+ or -)
-// - title: optional title after the callout marker
-const calloutRegex = /^(\s*)((?:>\s*)+)\[!(?<type>[^\]]+)\](?<fold>[+-])?(?<title>.*)/;
-
-// Tags for syntax highlighting
 export const callout = Tag.define();
 export const calloutMark = Tag.define(callout);
-export const calloutTypeString = Tag.define(callout);
-export const calloutFoldIndicator = Tag.define(callout);
-export const calloutTitleString = Tag.define(callout);
+export const calloutType = Tag.define(callout);
+export const calloutFold = Tag.define(callout);
+export const calloutTitle = Tag.define(callout);
+
+const CalloutNode = { name: "Callout", style: callout };
+const CalloutMarkNode = { name: "CalloutMark", style: calloutMark };
+const CalloutTypeNode = { name: "CalloutType", style: calloutType };
+const CalloutFoldNode = { name: "CalloutFoldMark", style: calloutFold };
+const CalloutTitleNode = { name: "CalloutTitle", style: calloutTitle };
+
+const calloutRegex = /^\[!(?<type>[^\]]+)\](?<fold>[+-])?(?<title>.*)/;
 
 export const calloutParser: MarkdownConfig = {
-    defineNodes: [
-        { name: "Callout", block: true, style: callout },
-        { name: "CalloutMark", style: calloutMark },
-        { name: "CalloutTypeString", style: calloutTypeString },
-        { name: "CalloutFoldIndicator", style: calloutFoldIndicator },
-        { name: "CalloutTitleString", style: calloutTitleString },
-    ],
-    parseBlock: [{
-        name: "Callout",
-        parse(cx: BlockContext, line: Line): boolean {
-            const match = calloutRegex.exec(line.text);
-            if (!match || !match.groups) return false;
+  defineNodes: [
+    CalloutNode,
+    CalloutMarkNode,
+    CalloutTypeNode,
+    CalloutFoldNode,
+    CalloutTitleNode,
+  ],
+  parseInline: [{
+    name: "Callout",
+    parse(cx, next, pos) {
+      const text = cx.slice(pos, cx.end);
+      const match = calloutRegex.exec(text);
 
-            const { type: rawType, fold: foldIndicator, title: rawTitle } = match.groups;
-            const indentation = match[1];
-            const quotePrefixes = match[2];
+      if (!match || !match.groups) {
+        return -1;
+      }
+      
+      const { type, fold, title } = match.groups;
+      if (!type) {
+        return -1;
+      }
 
-            // Determine nesting level by counting '>' characters
-            const nestingLevel = (quotePrefixes.match(/>/g) || []).length;
+      const fullMatchLength = match[0].length;
+      const children = [];
+      let currentPosInMatch = 0;
 
-            // Trim type and title
-            const calloutTypeStr = rawType.trim();
-            const explicitTitleStr = rawTitle.trim();
+      // Mark for "[!"
+      children.push(cx.elt("CalloutMark", pos + currentPosInMatch, pos + currentPosInMatch + 2));
+      currentPosInMatch += 2;
 
-            // Calculate positions
-            const firstLineStartGlobal = cx.lineStart;
-            const elements: Element[] = [];
+      // Type
+      children.push(cx.elt("CalloutType", pos + currentPosInMatch, pos + currentPosInMatch + type.length));
+      currentPosInMatch += type.length;
+      
+      // Mark for "]"
+      children.push(cx.elt("CalloutMark", pos + currentPosInMatch, pos + currentPosInMatch + 1));
+      currentPosInMatch += 1;
+      
+      // Fold
+      if (fold) {
+        children.push(cx.elt("CalloutFoldMark", pos + currentPosInMatch, pos + currentPosInMatch + 1));
+        currentPosInMatch += 1;
+      }
+      
+      // Title
+      if (title) {
+        const trimmedTitle = title.trim();
+        if (trimmedTitle.length > 0) {
+            const titleStartOffset = title.indexOf(trimmedTitle);
+            const titleStart = pos + currentPosInMatch + titleStartOffset;
+            children.push(cx.elt("CalloutTitle", titleStart, titleStart + trimmedTitle.length));
+        }
+      }
 
-            // Parse the first line (callout definition)
-            const prefixEndPos = indentation.length + quotePrefixes.length;
-            const openBracketPos = prefixEndPos;
-            const typeStartPos = openBracketPos + 2; // After "[!"
-            const typeBracketEndPos = typeStartPos + calloutTypeStr.length;
-            const closeBracketPos = typeBracketEndPos;
-
-            // Add callout mark for "[!"
-            elements.push(cx.elt("CalloutMark",
-                firstLineStartGlobal + openBracketPos,
-                firstLineStartGlobal + typeStartPos
-            ));
-
-            // Add callout type
-            elements.push(cx.elt("CalloutTypeString",
-                firstLineStartGlobal + typeStartPos,
-                firstLineStartGlobal + typeBracketEndPos
-            ));
-
-            // Add closing bracket mark for "]"
-            elements.push(cx.elt("CalloutMark",
-                firstLineStartGlobal + closeBracketPos,
-                firstLineStartGlobal + closeBracketPos + 1
-            ));
-
-            // Position for searching for title/fold indicator
-            let currentPos = closeBracketPos + 1;
-
-            // Add fold indicator if present
-            if (foldIndicator) {
-                const foldPos = line.text.indexOf(foldIndicator, closeBracketPos + 1);
-                if (foldPos !== -1) {
-                    elements.push(cx.elt("CalloutFoldIndicator",
-                        firstLineStartGlobal + foldPos,
-                        firstLineStartGlobal + foldPos + 1
-                    ));
-                    currentPos = foldPos + 1;
-                }
-            }
-
-            // Add title if present
-            if (explicitTitleStr.length > 0) {
-                const titlePos = line.text.indexOf(explicitTitleStr, currentPos);
-                if (titlePos !== -1) {
-                    elements.push(cx.elt("CalloutTitleString",
-                        firstLineStartGlobal + titlePos,
-                        firstLineStartGlobal + titlePos + explicitTitleStr.length
-                    ));
-                }
-            }
-
-            // Track the callout's content boundaries
-            let calloutEndPos = firstLineStartGlobal + line.text.length;
-            let prevLineIndentLevel = nestingLevel;
-
-            // Process subsequent content lines
-            while (cx.nextLine()) {
-                // Check if we've reached the end of the callout
-                if (line.isBlank) {
-                    // Check if next line continues the callout
-                    const nextLine = cx.lineStart + line.text.length;
-                    const peek = cx.input.chunk(nextLine);
-
-                    // If next line doesn't have enough '>' markers, we're done with this callout
-                    const nextLineQuoteCount = (peek.match(/^\s*>/g) || []).length;
-                    if (nextLineQuoteCount < nestingLevel) {
-                        break;
-                    }
-                }
-
-                // Check if this line has the required nesting level of '>' markers
-                const lineQuotes = line.text.match(/^\s*(?:>\s*)+/);
-                if (!lineQuotes) break;
-
-                const lineQuoteCount = (lineQuotes[0].match(/>/g) || []).length;
-
-                // If this line has fewer '>' than our callout's level, we're done
-                if (lineQuoteCount < nestingLevel) {
-                    break;
-                }
-
-                // If this is the start of a nested callout with higher nesting level, continue
-                // (the nested callout will be parsed by another call to this parser)
-                const isNestedCallout = calloutRegex.test(line.text) && lineQuoteCount > prevLineIndentLevel;
-                if (!isNestedCallout) {
-                    // Update the callout's end position
-                    calloutEndPos = cx.lineStart + line.text.length;
-                }
-
-                prevLineIndentLevel = lineQuoteCount;
-            }
-
-            // Add the complete callout element
-            cx.addElement(cx.elt("Callout", firstLineStartGlobal, calloutEndPos, elements));
-
-            // Rewind to ensure nested content is properly parsed
-            if (cx.lineStart + line.text.length >= calloutEndPos) {
-                cx.nextLine();
-            }
-
-            return true;
-        },
-        before: "Blockquote" // Run before blockquote parser
-    }]
+      return cx.addElement(cx.elt("Callout", pos, pos + fullMatchLength, children));
+    },
+    before: "Link"
+  }]
 };

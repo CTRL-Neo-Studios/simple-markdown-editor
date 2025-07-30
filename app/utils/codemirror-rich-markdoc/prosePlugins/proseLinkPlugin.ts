@@ -3,7 +3,8 @@ import {StateField, RangeSet} from '@codemirror/state';
 import {syntaxTree} from '@codemirror/language';
 import type {EditorState, Range as EditorRange} from '@codemirror/state';
 import {isNodeRangeActive} from "./proseInternalLinkPlugin";
-import {ImageEmbedWidget} from './widget/ImageEmbedWidget';
+import {VueEmbedWidget} from './widget/VueEmbedWidget';
+import ImageEmbed from '~/components/Embeds/ImageEmbed.vue';
 
 function buildLinkDecorations(state: EditorState): EditorRange<Decoration>[] {
     const decorations: EditorRange<Decoration>[] = [];
@@ -17,7 +18,7 @@ function buildLinkDecorations(state: EditorState): EditorRange<Decoration>[] {
                     const url = state.doc.sliceString(urlNode.from, urlNode.to);
                     const line = state.doc.lineAt(node.from);
                     widgets.push(Decoration.widget({
-                        widget: new ImageEmbedWidget(url, node.from, urlNode.from, urlNode.to),
+                        widget: new VueEmbedWidget(ImageEmbed, { filePath: url }, node.from),
                         block: true,
                         side: 1
                     }).range(line.to));
@@ -43,7 +44,7 @@ function buildLinkDecorations(state: EditorState): EditorRange<Decoration>[] {
                         const linkAttributes = {
                             'href': url,
                             'target': '_blank',
-                            'class': 'cm-link',
+                            'class': 'cm-clickable-link',
                             'data-external-link': 'true',
                             'data-url': url,
                             'data-text': text
@@ -70,7 +71,7 @@ function buildLinkDecorations(state: EditorState): EditorRange<Decoration>[] {
                 if (isImage) {
                     const line = state.doc.lineAt(node.from);
                     widgets.push(Decoration.widget({
-                        widget: new ImageEmbedWidget(url, node.from),
+                        widget: new VueEmbedWidget(ImageEmbed, { filePath: url }, node.from),
                         block: true,
                         side: 1
                     }).range(line.to));
@@ -82,7 +83,7 @@ function buildLinkDecorations(state: EditorState): EditorRange<Decoration>[] {
                         attributes: {
                             href: url,
                             target: '_blank',
-                            class: 'cm-link',
+                            class: 'cm-clickable-link',
                             'data-external-link': 'true',
                             'data-url': url
                         }
