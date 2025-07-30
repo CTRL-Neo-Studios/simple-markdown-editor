@@ -174,8 +174,8 @@
         @apply rounded-b-lg border-b border-b-default pb-1 px-1;
     }
 
-    .cm-callout-widget, .callout {
-        @apply p-3 relative flex flex-col h-fit mx-2 my-2 rounded-lg border border-primary/20 bg-primary/20; /* Removed transition-all from parent to be more specific */
+    .callout-embed, .callout {
+        @apply p-3 relative flex flex-col h-fit mx-2 my-2 rounded-lg border border-primary/20 border-l-6 bg-primary/20; /* Removed transition-all from parent to be more specific */
 
         summary {
             @apply inline-flex;

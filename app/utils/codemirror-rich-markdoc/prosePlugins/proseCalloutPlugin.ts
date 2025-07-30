@@ -2,7 +2,8 @@ import { Decoration, type DecorationSet, EditorView } from '@codemirror/view';
 import { StateField, RangeSet } from '@codemirror/state';
 import { syntaxTree } from '@codemirror/language';
 import type { EditorState, Range as EditorRange } from '@codemirror/state';
-import { CalloutWidget } from './widget/CalloutWidget';
+import { VueEmbedWidget } from './widget/VueEmbedWidget';
+import CalloutEmbed from '~/components/Embeds/CalloutEmbed.vue';
 import type { SyntaxNode } from '@lezer/common';
 
 function isNodeRangeActive(state: EditorState, nodeFrom: number, nodeTo: number): boolean {
@@ -41,27 +42,23 @@ function buildCalloutWidgetDecorations(state: EditorState): EditorRange<Decorati
       if (node.name === 'Blockquote') {
         const calloutNode = getCalloutNode(node.node);
         
-        // A callout is an "outermost" callout if its parent is NOT another Blockquote.
         if (calloutNode && node.node.parent?.name !== 'Blockquote') {
           const from = node.from;
           const to = node.to;
 
           if (!isNodeRangeActive(state, from, to)) {
+            const content = state.doc.sliceString(from, to);
             decorations.push(Decoration.replace({
-              widget: new CalloutWidget(from, to),
+              widget: new VueEmbedWidget(CalloutEmbed, { content }, from),
               block: true,
             }).range(from, to));
           }
-          // By only decorating the outermost callout, we prevent nested ranges.
-          // The widget's markdown-it renderer will handle the nested callouts.
-          // We can safely return false to stop descending into this branch.
           return false;
         }
       }
     }
   });
   
-  // The logic now prevents overlapping ranges by design, but sorting is a good safeguard.
   return decorations.sort((a, b) => a.from - b.from);
 }
 
