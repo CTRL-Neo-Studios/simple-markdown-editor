@@ -7,34 +7,31 @@ import type { SyntaxNode } from '@lezer/common';
 
 function isNodeRangeActive(state: EditorState, nodeFrom: number, nodeTo: number): boolean {
   const cursor = state.selection.main;
-  return Math.max(nodeFrom, cursor.from) <= Math.min(nodeTo, cursor.to);
+  if (cursor.empty) {
+    return cursor.from >= nodeFrom && cursor.from <= nodeTo;
+  }
+  return Math.max(nodeFrom, cursor.from) < Math.min(nodeTo, cursor.to);
 }
 
 function getCalloutNode(blockquoteNode: SyntaxNode): SyntaxNode | null {
     let calloutNode: SyntaxNode | null = null;
-    let paragraphNode: SyntaxNode | null = null;
-
-    // Find the first paragraph within the blockquote
-    blockquoteNode.cursor().iterate(node => {
-        if (node.name === 'Paragraph') {
-            paragraphNode = node.node;
-            return false; // Stop after finding the first paragraph
-        }
-    });
-
-    if (!paragraphNode) return null;
+    let found = false;
     
-    // Check for a Callout node within that paragraph
-    paragraphNode.cursor().iterate(node => {
-        if (node.name === 'Callout') {
-            calloutNode = node.node;
-            return false; // Stop after finding the callout
+    blockquoteNode.cursor().iterate(node => {
+        if (found) return false;
+        if (node.name === 'Paragraph') {
+            node.node.cursor().iterate(child => {
+                if (child.name === 'Callout') {
+                    calloutNode = child.node;
+                    found = true;
+                    return false;
+                }
+            });
+            return false;
         }
     });
-
     return calloutNode;
 }
-
 
 function buildCalloutWidgetDecorations(state: EditorState): EditorRange<Decoration>[] {
   const decorations: EditorRange<Decoration>[] = [];
@@ -44,23 +41,28 @@ function buildCalloutWidgetDecorations(state: EditorState): EditorRange<Decorati
       if (node.name === 'Blockquote') {
         const calloutNode = getCalloutNode(node.node);
         
-        if (calloutNode) {
-          const isActive = isNodeRangeActive(state, node.from, node.to);
+        // A callout is an "outermost" callout if its parent is NOT another Blockquote.
+        if (calloutNode && node.node.parent?.name !== 'Blockquote') {
+          const from = node.from;
+          const to = node.to;
 
-          if (!isActive) {
+          if (!isNodeRangeActive(state, from, to)) {
             decorations.push(Decoration.replace({
-              widget: new CalloutWidget(calloutNode.from, calloutNode.to),
+              widget: new CalloutWidget(from, to),
               block: true,
-            }).range(node.from, node.to));
+            }).range(from, to));
           }
-          // This is a callout block, so don't process its children for more blockquotes.
-          // This prevents nested callouts from creating overlapping decorations.
+          // By only decorating the outermost callout, we prevent nested ranges.
+          // The widget's markdown-it renderer will handle the nested callouts.
+          // We can safely return false to stop descending into this branch.
           return false;
         }
       }
     }
   });
-  return decorations;
+  
+  // The logic now prevents overlapping ranges by design, but sorting is a good safeguard.
+  return decorations.sort((a, b) => a.from - b.from);
 }
 
 export const proseCalloutPlugin = StateField.define<DecorationSet>({
@@ -73,5 +75,5 @@ export const proseCalloutPlugin = StateField.define<DecorationSet>({
     }
     return value.map(tr.changes);
   },
-  provide: f => EditorView.decorations.from(f)
+  provide: f => EditorView.decorations.from(f),
 });
