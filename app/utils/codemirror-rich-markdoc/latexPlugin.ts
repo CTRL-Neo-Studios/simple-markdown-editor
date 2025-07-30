@@ -100,6 +100,18 @@ class InlineLatexWidget extends WidgetType {
     katex.render(this.content, container, {
       throwOnError: false
     })
+
+    container.addEventListener('click', () => {
+      const pos = view.posAtDOM(container)
+      const tree = syntaxTree(view.state)
+      const node = tree.resolve(pos)
+      if (node.name === 'TexInline') {
+        view.dispatch({
+          selection: { anchor: node.from, head: node.to }
+        })
+      }
+    })
+
     return container
   }
 }
