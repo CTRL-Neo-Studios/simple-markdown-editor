@@ -16,6 +16,7 @@ import { markParser } from './parsers/markParser';
 import { taskListParser } from './parsers/taskListParser';
 import { texParser } from './parsers/texParser';
 import { yamlFrontmatterParser } from './parsers/yamlFrontmatterParser';
+import { latex } from '~/utils/codemirror-rich-markdoc/latexPlugin';
 
 import type { Config } from '@markdoc/markdoc';
 import {calloutParser} from "~/utils/codemirror-rich-markdoc/parsers/calloutParser";
@@ -56,7 +57,8 @@ export default function (config: MarkdocPluginConfig) {
         provide: v => [
             renderBlock(config.markdoc), // Markdoc renderBlock widget
             syntaxHighlighting(highlightStyle),
-            markdown(mergedConfig) // The core markdown extension with all parsers
+            markdown(mergedConfig), // The core markdown extension with all parsers
+            latex()
         ],
         // eventHandlers: {
         //     mouseup(event, view) {
